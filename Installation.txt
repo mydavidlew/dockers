@@ -14,7 +14,7 @@ Docker-shellrunservers
 [MongoDB]>> docker run --rm --name=mongo1 --network=appnet --env "MONGO_INITDB_ROOT_USERNAME=root" --env "MONGO_INITDB_ROOT_PASSWORD=password" --mount type=bind,src=/Users/davidlew/Docker/mongo/data,dst=/data/db -p 27017:27017 -d mongo
 
 Docker-mysql
->> docker pull mysql/mysql-server
+>> docker pull mysql/mysql-server:latest
 >> docker run --rm --name=mysql1 --env "MYSQL_ROOT_PASSWORD=password" -p 3306:3306 -p 33060:33060 -d mysql/mysql-server
 >> docker run --rm --name=mysql1 --network=appnet --env "MYSQL_ROOT_PASSWORD=password" --mount type=bind,src=/Users/davidlew/Docker/mysql/etc/my.cnf,dst=/etc/my.cnf --mount type=bind,src=/Users/davidlew/Docker/mysql/data,dst=/var/lib/mysql -p 3306:3306 -d mysql/mysql-server
 >> docker logs mysql1
