@@ -10,6 +10,7 @@ $ sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/do
 
 Install docker-ce:
 $ sudo yum install docker-ce
+$ sudo yum install docker-ce docker-ce-cli containerd.io
 
 Add your user to the docker group with the following command.
 $ sudo usermod -aG docker $(whoami)
