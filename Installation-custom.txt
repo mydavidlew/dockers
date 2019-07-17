@@ -1,2 +1,9 @@
+Docker-Hadoop
+>> docker pull sequenceiq/hadoop-docker
+>> docker run -it sequenceiq/hadoop-docker:latest /etc/bootstrap.sh -bash
+>> docker run --rm --name=hadoop1 -p 9000:9000 -p 8088:8088 -p 50070:50070 -it sequenceiq/hadoop-docker:latest /etc/bootstrap.sh -bash
+>>
+
 Docker-ElasticSearch
->> docker pull docker.elastic.co/elasticsearch/elasticsearch:latest
+>> docker pull docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+>> docker run --rm --name=elastic1 --network=appnet --env "discovery.type=single-node" -p 9200:9200 -p 9300:9300 -d docker.elastic.co/elasticsearch/elasticsearch:7.2.0
