@@ -17,4 +17,9 @@ Docker-ElasticSearch
 >> docker exec -it elastic1 bash
 >> docker stop elastic1
 
-
+Docker-Kibana
+>> docker pull docker.elastic.co/kibana/kibana:7.2.0
+>> docker run --rm --name=kibana1 --network=appnet --link elastic1:elasticsearch -p 5601:5601 -d docker.elastic.co/kibana/kibana:7.2.0
+>> docker logs kibana1
+>> docker exec -it kibana1 bash
+>> docker stop kibana1
