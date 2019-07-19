@@ -23,3 +23,10 @@ Docker-Kibana
 >> docker logs kibana1
 >> docker exec -it kibana1 bash
 >> docker stop kibana1
+
+Docker-Logstash
+>> docker pull docker.elastic.co/logstash/logstash:7.2.0
+>> docker run --rm --name=logstash1 --network=appnet --mount type=bind,src=/opt/docker/logstash/conf,dst=/usr/share/logstash/config --mount type=bind,src=/opt/docker/logstash/pipeline,dst=/usr/share/logstash/pipeline -d docker.elastic.co/logstash/logstash:7.2.0
+>> docker logs logstash1
+>> docker exec -it logstash1 bash
+>> docker stop logstash1
