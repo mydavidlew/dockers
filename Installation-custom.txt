@@ -30,3 +30,19 @@ Docker-Logstash
 >> docker logs logstash1
 >> docker exec -it logstash1 bash
 >> docker stop logstash1
+
+Docker-Beats
+>> [Auditbeat]   docker pull docker.elastic.co/beats/auditbeat:7.2.0
+>> [Filebeat]    docker pull docker.elastic.co/beats/filebeat:7.2.0
+>> [Heartbeat]   docker pull docker.elastic.co/beats/heartbeat:7.2.0
+>> [Journalbeat] docker pull docker.elastic.co/beats/journalbeat:7.2.0 
+>> [Metricbeat]  docker pull docker.elastic.co/beats/metricbeat:7.2.0
+>> [Packetbeat]  docker pull docker.elastic.co/beats/packetbeat:7.2.0
+>>
+>> [Filebeat and index pattern setup]
+>> docker run -it --rm --name=filebeat1 --network=appnet --link kibana1:kibana --link elastic1:elasticsearch docker.elastic.co/beats/filebeat:7.2.0 setup -E setup.kibana.host=kibana:5601 -E output.elasticsearch.hosts=["elasticsearch:9200"]
+>> docker run --rm --name=filebeat1 --network=appnet --link elastic1:elasticsearch --mount type=bind,src=/opt/docker/filebeat/conf/filebeat.yml,dst=/usr/share/filebeat/filebeat.yml -d docker.elastic.co/beats/filebeat:7.2.0
+>> docker logs filebeat1
+>> docker exec -it filebeat1 bash
+>> docker stop filebeat1
+>>
