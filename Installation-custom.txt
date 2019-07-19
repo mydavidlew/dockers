@@ -42,6 +42,7 @@ Docker-Beats
 >> [Filebeat and index pattern setup]
 >> docker run -it --rm --name=filebeat1 --network=appnet --link elastic1:elasticsearch --link kibana1:kibana docker.elastic.co/beats/filebeat:7.2.0 setup -E setup.kibana.host=kibana:5601 -E output.elasticsearch.hosts=["elasticsearch:9200"]
 >> docker run --rm --name=filebeat1 --network=appnet --link elastic1:elasticsearch --link kibana1:kibana --link logstash1:logstash --mount type=bind,src=/opt/docker/filebeat/conf/filebeat.yml,dst=/usr/share/filebeat/filebeat.yml -d docker.elastic.co/beats/filebeat:7.2.0
+>> docker run --rm --name=filebeat1 --network=appnet --link elastic1:elasticsearch --link kibana1:kibana --link logstash1:logstash --mount type=bind,src=/opt/docker/filebeat/conf/filebeat.yml,dst=/usr/share/filebeat/filebeat.yml --mount type=bind,src=/opt/docker/filebeat/vmlog,dst=/usr/share/filebeat/logs -d docker.elastic.co/beats/filebeat:7.2.0
 >> docker logs filebeat1
 >> docker exec -it filebeat1 bash
 >> docker stop filebeat1
