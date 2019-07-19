@@ -19,14 +19,14 @@ Docker-ElasticSearch
 
 Docker-Kibana
 >> docker pull docker.elastic.co/kibana/kibana:7.2.0
->> docker run --rm --name=kibana1 --network=appnet --link elastic1:elasticsearch -p 5601:5601 -d docker.elastic.co/kibana/kibana:7.2.0
+>> docker run --rm --name=kibana1 --network=appnet --link elastic1:elasticsearch --mount type=bind,src=/opt/docker/kibana/conf,dst=/usr/share/kibana/config -p 5601:5601 -d docker.elastic.co/kibana/kibana:7.2.0
 >> docker logs kibana1
 >> docker exec -it kibana1 bash
 >> docker stop kibana1
 
 Docker-Logstash
 >> docker pull docker.elastic.co/logstash/logstash:7.2.0
->> docker run --rm --name=logstash1 --network=appnet --mount type=bind,src=/opt/docker/logstash/conf,dst=/usr/share/logstash/config --mount type=bind,src=/opt/docker/logstash/pipeline,dst=/usr/share/logstash/pipeline -d docker.elastic.co/logstash/logstash:7.2.0
+>> docker run --rm --name=logstash1 --network=appnet --link elastic1:elasticsearch --mount type=bind,src=/opt/docker/logstash/conf,dst=/usr/share/logstash/config --mount type=bind,src=/opt/docker/logstash/pipeline,dst=/usr/share/logstash/pipeline -d docker.elastic.co/logstash/logstash:7.2.0
 >> docker logs logstash1
 >> docker exec -it logstash1 bash
 >> docker stop logstash1
