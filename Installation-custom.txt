@@ -40,7 +40,7 @@ Docker-Beats
 >> [Packetbeat]  docker pull docker.elastic.co/beats/packetbeat:7.2.0
 >>
 >> [Filebeat and index pattern setup]
->> docker run -it --rm --name=filebeat1 --network=appnet --link elastic1:elasticsearch --link kibana1:kibana --link logstash1:logstash docker.elastic.co/beats/filebeat:7.2.0 setup --dashboards --machine-learning
+>> docker run -it --rm --name=filebeat1 --network=appnet --link elastic1:elasticsearch --link kibana1:kibana --link logstash1:logstash docker.elastic.co/beats/filebeat:7.2.0 setup --dashboards --machine-learning -E setup.kibana.host=kibana1:5601
 >> docker run -it --rm --name=filebeat1 --network=appnet --link elastic1:elasticsearch --link kibana1:kibana --link logstash1:logstash docker.elastic.co/beats/filebeat:7.2.0 setup -E setup.kibana.host=kibana:5601 -E output.elasticsearch.hosts=["elasticsearch:9200"]
 >> docker run --rm --name=filebeat1 --network=appnet --link elastic1:elasticsearch --link kibana1:kibana --link logstash1:logstash --mount type=bind,src=/opt/docker/filebeat/conf/filebeat.yml,dst=/usr/share/filebeat/filebeat.yml -d docker.elastic.co/beats/filebeat:7.2.0
 >> docker run --rm --name=filebeat1 --network=appnet --link elastic1:elasticsearch --link kibana1:kibana --link logstash1:logstash --mount type=bind,src=/opt/docker/filebeat/conf/filebeat.yml,dst=/usr/share/filebeat/filebeat.yml --mount type=bind,src=/opt/docker/filebeat/vmlog,dst=/usr/share/filebeat/logs -d docker.elastic.co/beats/filebeat:7.2.0
