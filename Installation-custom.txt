@@ -1,14 +1,6 @@
 Docker-shellrunservers
 >> docker network create appnet
 
-Docker-Hadoop
->> docker pull sequenceiq/hadoop-docker
->> docker run -it sequenceiq/hadoop-docker:latest /etc/bootstrap.sh -bash
->> docker run --rm --name=hadoop1 -p 9000:9000 -p 8088:8088 -p 50070:50070 -it sequenceiq/hadoop-docker:latest /etc/bootstrap.sh -bash
->> docker logs hadoop1
->> docker exec -it hadoop1 bash
->> docker stop hadoop1
-
 Docker-ElasticSearch
 >> docker pull docker.elastic.co/elasticsearch/elasticsearch:7.2.0
 >> docker run --rm --name=elastic1 --network=appnet --env "discovery.type=single-node" -p 9200:9200 -p 9300:9300 -d docker.elastic.co/elasticsearch/elasticsearch:7.2.0
@@ -47,4 +39,29 @@ Docker-Beats
 >> docker logs filebeat1
 >> docker exec -it filebeat1 bash
 >> docker stop filebeat1
+
+Docker-Drools KIE Execution Server
+>> docker pull jboss/kie-server:latest
+>> docker run -it --name=kie-server -p 8080:8080 -d jboss/kie-server:latest
+>> docker run --rm --name=kie-server --network=appnet --mount type=bind,src=/opt/docker/kie-server/vmlog,dst=/usr/share/filebeat/logs -p 8080:8080 -d jboss/kie-server:latest
 >>
+>> [Once container and web applications started, the application is available at:]
+>> http://localhost:8080/kie-server
+>> [The REST API service is located at:]
+>> http://localhost:8080/kie-server/services/rest/server/
+
+Docker-Drools Business-Central Workbench
+>> docker pull jboss/business-central-workbench:latest
+>> docker run -it --name=business-central-workbench -p 8080:8080 -p 8001:8001 -d jboss/business-central-workbench:latest
+>> docker run -it --name=business-central-workbench -p 8080:8080 -p 8001:8001 -d jboss/business-central-workbench:latest
+>>
+>> [Once container and web applications started, you can navigate into the business-central Workbench at:]
+>> http://localhost:8080/business-central
+
+Docker-Hadoop
+>> docker pull sequenceiq/hadoop-docker
+>> docker run -it sequenceiq/hadoop-docker:latest /etc/bootstrap.sh -bash
+>> docker run --rm --name=hadoop1 -p 9000:9000 -p 8088:8088 -p 50070:50070 -it sequenceiq/hadoop-docker:latest /etc/bootstrap.sh -bash
+>> docker logs hadoop1
+>> docker exec -it hadoop1 bash
+>> docker stop hadoop1
