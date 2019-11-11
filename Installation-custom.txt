@@ -42,7 +42,7 @@ Docker-Beats
 
 Docker-Drools KIE Execution Server
 >> docker pull jboss/kie-server:latest
->> docker run -it --rm --name=kie-server1 --network=appnet --link kie-workbench1:business-central-workbench -p 8080:8080 -d jboss/kie-server:latest
+>> docker run -it --rm --name=kie-server1 --network=appnet --link kie-workbench1:business-central-workbench -p 8080:8080 jboss/kie-server:latest
 >> docker run --rm --name=kie-server1 --network=appnet --link kie-workbench1:business-central-workbench --mount type=bind,src=/opt/docker/kie-server/conf,dst=/opt/jboss/wildfly/standalone/configuration -p 8080:8080 -d jboss/kie-server:latest
 >> docker logs kie-server1
 >> docker exec -it kie-server1 bash
@@ -59,7 +59,7 @@ Docker-Drools KIE Execution Server
 
 Docker-Drools Business-Central Workbench
 >> docker pull jboss/business-central-workbench:latest
->> docker run -it --rm --name=kie-workbench1 --network=appnet --link kie-server1:kie-server -p 8080:8080 -p 8001:8001 -d jboss/business-central-workbench:latest
+>> docker run -it --rm --name=kie-workbench1 --network=appnet --link kie-server1:kie-server -p 8080:8080 -p 8001:8001 jboss/business-central-workbench:latest
 >> docker run --rm --name=kie-workbench1 --network=appnet --link kie-server1:kie-server --mount type=bind,src=/opt/docker/kie-workbench/conf,dst=/opt/jboss/wildfly/standalone/configuration -p 8080:8080 -p 8001:8001 -d jboss/business-central-workbench:latest
 >> docker logs kie-workbench1
 >> docker exec -it kie-workbench1 bash
