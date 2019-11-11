@@ -53,9 +53,9 @@ Docker-Drools KIE Execution Server
 >> [The REST API service is located at:]
 >> http://localhost:8080/kie-server/services/rest/server/
 >> [To add Management Users to the container]
->> ./add-user -u admin -p mimosbhd -ro admin,analyst,developer,manager,user,kiemgmt,kie-server,rest-all
+>> ./add-user.sh -u admin -p mimosbhd -ro admin,analyst,developer,manager,user,kiemgmt,kie-server,rest-all
 >> [To add Application Users to the container]
->> ./add-user -a -u kieserver -p kieserver -ro admin,analyst,developer,manager,user,kiemgmt,kie-server,rest-all
+>> ./add-user.sh -a -u kieserver -p kieserver -ro admin,analyst,developer,manager,user,kiemgmt,kie-server,rest-all
 
 Docker-Drools Business-Central Workbench
 >> docker pull jboss/business-central-workbench:latest
@@ -68,9 +68,9 @@ Docker-Drools Business-Central Workbench
 >> [Once container and web applications started, you can navigate into the business-central Workbench at:]
 >> http://localhost:8080/business-central
 >> [To add Management Users to the container]
->> ./add-user -u admin -p mimosbhd -ro admin,analyst,developer,manager,user,kiemgmt,kie-server,rest-all
+>> ./add-user.sh -u admin -p mimosbhd -ro admin,analyst,developer,manager,user,kiemgmt,kie-server,rest-all
 >> [To add Application Users to the container]
->> ./add-user -a -u kieserver -p kieserver -ro admin,analyst,developer,manager,user,kiemgmt,kie-server,rest-all
+>> ./add-user.sh -a -u kieserver -p kieserver -ro admin,analyst,developer,manager,user,kiemgmt,kie-server,rest-all
 
 Docker-Hadoop
 >> docker pull sequenceiq/hadoop-docker
