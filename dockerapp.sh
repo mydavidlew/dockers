@@ -1,3 +1,4 @@
+[Docker-A]
 #!/bin/bash
 SLEEP_INT=1
 CMD_START=start; CMD_STOP=stop
@@ -76,6 +77,86 @@ else
     elif [[ $# -eq 1 && $1 == $CMD_STOP_MON ]] ; then
         echo "$(date) $line $$: stopping all monitoring services"
         docker stop $D_ALERT $D_CONTAINER $D_NODE $D_ADVISOR $D_PROMETHEUS $D_GRAFANA
+        sleep $SLEEP_INT
+    else
+        echo "$(date) $line $$: You have gone to the wrong party! use '$0 $CMD_START/$CMD_STOP/$CMD_START_MON/$CMD_STOP_MON'"
+    fi
+fi
+# show the docker containers and systems
+check_docker
+# end
+
+
+
+[Docker-C]
+#!/bin/bash
+SLEEP_INT=1
+CMD_START=startd; CMD_STOP=stopd
+CMD_START_MON=start; CMD_STOP_MON=stop
+D_NETWORK=appnet
+D_ES1=elasticsearch; D_KI1=kibana; D_LS1=logstash
+D_CON1=elastic1; D_CON2=kibana1; D_CON3=logstash1; D_CON4=filebeat1; D_CON5=none1; D_CON6=none1
+
+C_DOCKER="docker run --rm -d"
+C_MOUNT="--mount type=bind"
+L_PATH="/opt/docker"
+
+check_network() { 
+    if [ ! "$(docker network ls | grep $D_NETWORK)" ] ; then
+        echo "$(date) $line $$: creating $D_NETWORK bridge network"
+        docker network create $D_NETWORK
+        sleep $SLEEP_INT
+    else
+        echo "$(date) $line $$: $D_NETWORK bridge network exists"
+    fi
+}
+
+check_docker() {
+    echo "$(date) $line $$: list of container, storage and network"
+    docker ps -a
+    docker system df
+    docker network ls
+}
+
+if [[ $# -eq 0 ]] ; then
+    echo "$(date) $line $$: No argument supplied! use '$0 $CMD_START/$CMD_STOP/$CMD_START_MON/$CMD_STOP_MON'"
+else
+    if [[ $# -eq 1 && $1 == $CMD_START ]] ; then
+        echo "$(date) $line $$: starting all datastore services"
+        check_network
+        echo "$(date) $line $$: starting $D_CON6"
+        $C_DOCKER --name=$D_CON6 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/null",dst=/null -p 0000:0000 null
+        sleep $SLEEP_INT
+    elif [[ $# -eq 1 && $1 == $CMD_STOP ]] ; then
+        echo "$(date) $line $$: stopping all running services"
+        docker stop $D_CON6
+        sleep $SLEEP_INT
+    elif [[ $# -eq 1 && $1 == $CMD_START_MON ]] ; then
+        echo "$(date) $line $$: starting all monitoring services"
+        check_network
+        echo "$(date) $line $$: starting $D_CON1"
+        $C_DOCKER --name=$D_CON1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/elasticsearch/conf",dst=/usr/share/elasticsearch/config $C_MOUNT,src=$L_PATH"/elasticse
+arch/data",dst=/usr/share/elasticsearch/data --env "discovery.type=single-node" --env "cluster.name=elastic-cluster" -p 9200:9200 -p 9300:9300 docker.elastic.co/el
+asticsearch/elasticsearch:7.2.0
+        sleep $SLEEP_INT
+        echo "$(date) $line $$: starting $D_CON2"
+        $C_DOCKER --name=$D_CON2 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/kibana/conf",dst=/usr/share/kibana/config --link $D_CON1:$D_ES1 -p 5601:5601 docker.ela
+stic.co/kibana/kibana:7.2.0
+        sleep $SLEEP_INT
+        echo "$(date) $line $$: starting $D_CON3"
+        $C_DOCKER --name=$D_CON3 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/logstash/conf",dst=/usr/share/logstash/config $C_MOUNT,src=$L_PATH"/logstash/pipeline",
+dst=/usr/share/logstash/pipeline --link $D_CON1:$D_ES1 -p 5044:5044 docker.elastic.co/logstash/logstash:7.2.0
+        sleep $SLEEP_INT
+        echo "$(date) $line $$: starting $D_CON4"
+        $C_DOCKER --name=$D_CON4 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/filebeat/conf/filebeat.yml",dst=/usr/share/filebeat/filebeat.yml $C_MOUNT,src=$L_PATH"/
+filebeat/vmlog",dst=/usr/share/filebeat/logs --link $D_CON1:$D_ES1 --link $D_CON2:$D_KI1 --link $D_CON3:$D_LS1 docker.elastic.co/beats/filebeat:7.2.0
+        sleep $SLEEP_INT
+        echo "$(date) $line $$: starting $D_CON5"
+        $C_DOCKER --name=$D_CON5 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/null",dst=/null -p 0000:0000 null
+        sleep $SLEEP_INT
+    elif [[ $# -eq 1 && $1 == $CMD_STOP_MON ]] ; then
+        echo "$(date) $line $$: stopping all monitoring services"
+        docker stop $D_CON1 $D_CON2 $D_CON3 $D_CON4 $D_CON5
         sleep $SLEEP_INT
     else
         echo "$(date) $line $$: You have gone to the wrong party! use '$0 $CMD_START/$CMD_STOP/$CMD_START_MON/$CMD_STOP_MON'"
