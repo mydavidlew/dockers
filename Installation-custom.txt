@@ -62,12 +62,12 @@ Docker-Drools KIE Execution Server
 >>
 >> [Once container and web applications started, the application is available at:]
 >> http://10.0.1.54:8080/kie-server
->> [The REST API service is located at:]
+>> [The Kie Server REST API service is located at:]
 >> http://10.0.1.54:8080/kie-server/services/rest/server/
 >> [To add Management Users to the container]
->> ./add-user.sh -u admin -p mimosbhd -ro admin,analyst,developer,manager,user,kiemgmt,kie-server,rest-all
+>> ./add-user.sh -u admin -p mimosbhd -ro admin,kie-server,rest-all,analyst,developer,manager,user,kiemgmt
 >> [To add Application Users to the container]
->> ./add-user.sh -a -u kieserver -p kieserver -ro admin,analyst,developer,manager,user,kiemgmt,kie-server,rest-all
+>> ./add-user.sh -a -u kieserver -p kieserver -ro admin,kie-server,rest-all,analyst,developer,manager,user,kiemgmt
 
 Docker-Drools Business-Central Workbench
 >> docker pull jboss/business-central-workbench:7.29.0.Final
@@ -79,10 +79,12 @@ Docker-Drools Business-Central Workbench
 >>
 >> [Once container and web applications started, you can navigate into the business-central Workbench at:]
 >> http://10.0.1.54:8090/business-central
+>> [The jBPM controller REST endpoints is located at:]
+>> http://10.0.1.54:8090/business-central/rest/controller
 >> [To add Management Users to the container]
->> ./add-user.sh -u admin -p mimosbhd -ro admin,analyst,developer,manager,user,kiemgmt,kie-server,rest-all
+>> ./add-user.sh -u admin -p mimosbhd -ro admin,kie-server,rest-all,analyst,developer,manager,user,kiemgmt
 >> [To add Application Users to the container]
->> ./add-user.sh -a -u kieserver -p kieserver -ro admin,analyst,developer,manager,user,kiemgmt,kie-server,rest-all
+>> ./add-user.sh -a -u kieserver -p kieserver -ro admin,kie-server,rest-all,analyst,developer,manager,user,kiemgmt
 
 Docker-Hadoop
 >> docker pull sequenceiq/hadoop-docker
