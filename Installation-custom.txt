@@ -88,6 +88,7 @@ Docker-Drools Business-Central Workbench
 >> http://10.0.1.54:8080/business-central
 >> [The jBPM controller REST endpoints is located at:]
 >> http://10.0.1.54:8080/business-central/rest/controller
+>> http://10.0.1.54:8080/business-central/rest/controller/management/servers
 >> [To add Management Users to the container]
 >> ./add-user.sh -u admin -p mimosbhd -ro admin,kie-server,rest-all,analyst,developer,manager,user,kiemgmt
 >> [To add Application Users to the container]
