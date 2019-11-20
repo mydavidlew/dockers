@@ -68,6 +68,7 @@ Docker-Drools KIE Execution Server
 >> http://10.0.1.54:8081/kie-server
 >> [The Kie Server REST API service is located at:]
 >> http://10.0.1.54:8081/kie-server/services/rest/server/
+>> http://10.0.1.54:8081/kie-server/services/rest/server/containers
 >> [To add Management Users to the container]
 >> ./add-user.sh -u admin -p mimosbhd -ro admin,kie-server,rest-all,analyst,developer,manager,user,kiemgmt
 >> [To add Application Users to the container]
