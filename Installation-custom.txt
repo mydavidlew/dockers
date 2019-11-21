@@ -56,8 +56,8 @@ Docker-Drools KIE Execution Server
 >> ["JAVA_OPTS=$JAVA_OPTS
 >>   -Dorg.kie.server.id=kie-server1
 >>   -Dorg.kie.server.user=kieserver -Dorg.kie.server.pwd=kieserver
->>   -Dorg.kie.server.location=http://10.0.1.54:8081/kie-server/services/rest/server
->>   -Dorg.kie.server.controller=ws://172.18.0.2:8080/business-central/websocket/controller
+>>   -Dorg.kie.server.location=http://kie-server1:8081/kie-server/services/rest/server
+>>   -Dorg.kie.server.controller=ws://kie-workbench1:8080/business-central/websocket/controller
 >>   -Dorg.kie.server.controller.user=kieserver -Dorg.kie.server.controller.pwd=kieserver
 >> "]
 >> docker pull jboss/kie-server:7.29.0.Final
@@ -83,8 +83,8 @@ Docker-Drools KIE Execution Server
 Docker-Drools Business-Central Workbench
 >> ["JAVA_OPTS=$JAVA_OPTS
 >>   -Dorg.kie.server.user=kieserver -Dorg.kie.server.pwd=kieserver
->>   ###-Dorg.kie.workbench.controller=ws://172.18.0.3:8080/kie-server/websocket/controller
->>   ###-Dorg.kie.server.controller=ws://172.18.0.2:8080/business-central/websocket/controller
+>>   ###-Dorg.kie.workbench.controller=ws://kie-server1:8080/kie-server/websocket/controller
+>>   ###-Dorg.kie.server.controller=ws://kie-workbench1:8080/business-central/websocket/controller
 >>   -Dorg.kie.workbench.controller.user=kieserver -Dorg.kie.workbench.controller.pwd=kieserver
 >> "]
 >> docker pull jboss/business-central-workbench:7.29.0.Final
