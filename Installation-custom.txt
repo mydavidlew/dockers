@@ -52,7 +52,7 @@ Docker-Beats
 >> docker exec -it filebeat1 bash
 >> docker stop filebeat1
 
-Docker-Drools KIE Execution Server
+Docker-Drools KIE Execution Server KIE_SERVER_PROFILE=standalone-full
 >> docker pull jboss/kie-server:7.29.0.Final
 >> docker run -it --rm --name=kie-server1 --network=appnet --link kie-workbench1:business-central-workbench -p 8081:8080 jboss/kie-server:7.29.0.Final
 >> docker run --rm --name=kie-server1 --network=appnet --link kie-workbench1:business-central-workbench -p 8081:8080 -d jboss/kie-server:7.29.0.Final
