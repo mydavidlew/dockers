@@ -1,0 +1,133 @@
+version: "3"
+
+services:
+  namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.1.3-java8
+    container_name: namenode
+    volumes:
+      - hadoop_namenode:/hadoop/dfs/name
+    networks:
+      - networks1
+    environment:
+      - CLUSTER_NAME=test
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 9870:9870
+  
+  resourcemanager:
+    image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.1.3-java8
+    container_name: resourcemanager
+    depends_on:
+      - namenode
+      - datanode1
+      - datanode2
+      - datanode3
+    networks:
+      - networks1
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 datanode1:9864 datanode2:9864 datanode3:9864"
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 8088:8088
+
+  historyserver:
+    image: bde2020/hadoop-historyserver:2.0.0-hadoop3.1.3-java8
+    container_name: historyserver
+    depends_on:
+      - namenode
+      - datanode1
+      - datanode2
+      - datanode3
+      - resourcemanager
+    volumes:
+      - hadoop_historyserver:/hadoop/yarn/timeline
+    networks:
+      - networks1
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 datanode1:9864 datanode2:9864 datanode3:9864 resourcemanager:8088"
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 8188:8188
+  
+  nodemanager1:
+    image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.1.3-java8
+    container_name: nodemanager1
+    depends_on:
+      - namenode
+      - datanode1
+      - datanode2
+      - datanode3
+      - resourcemanager
+    networks:
+      - networks1
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 datanode1:9864 datanode2:9864 datanode3:9864 resourcemanager:8088"
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 8042:8042
+  
+  datanode1:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.1.3-java8
+    container_name: datanode1
+    depends_on:
+      - namenode
+    volumes:
+      - hadoop_datanode1:/hadoop/dfs/data
+    networks:
+      - networks1
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870"
+    env_file:
+      - ./hadoop.env
+  
+  datanode2:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.1.3-java8
+    container_name: datanode2
+    depends_on:
+      - namenode
+    volumes:
+      - hadoop_datanode2:/hadoop/dfs/data
+    networks:
+      - networks1
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870"
+    env_file:
+      - ./hadoop.env
+  
+  datanode3:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.1.3-java8
+    container_name: datanode3
+    depends_on:
+      - namenode
+    volumes:
+      - hadoop_datanode3:/hadoop/dfs/data
+    networks:
+      - networks1
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870"
+    env_file:
+      - ./hadoop.env
+
+volumes:
+  hadoop_namenode:
+  hadoop_datanode1:
+  hadoop_datanode2:
+  hadoop_datanode3:
+  hadoop_historyserver:
+
+networks:
+  networks1:
+    external:
+      name: appnet
+
+# URL Paths for Hadoop Services
+# Namenode: http://<dockerhadoop_IP_address>:9870/dfshealth.html#tab-overview
+# History server: http://<dockerhadoop_IP_address>:8188/applicationhistory
+# Datanode: http://<dockerhadoop_IP_address>:9864/
+# Nodemanager: http://<dockerhadoop_IP_address>:8042/node
+# Resource manager: http://<dockerhadoop_IP_address>:8088/
+
