@@ -1,7 +1,7 @@
 Install Docker & Docker Compose - Centos 7
 https://github.com/NaturalHistoryMuseum/scratchpads2/wiki/Install-Docker-and-Docker-Compose-(Centos-7)
 
-Step 1 — Install Docker
+[Step 1 — Install Docker]
 Install needed packages:
 $ sudo yum install -y yum-utils device-mapper-persistent-data lvm2
 
@@ -21,7 +21,7 @@ $ sudo systemctl enable docker.service
 Finally, start the Docker service:
 $ sudo systemctl start docker.service
 
-Step 2 — Install Docker Compose
+[Step 2 — Install Docker Compose]
 Install Extra Packages for Enterprise Linux
 $ sudo yum install epel-release
 
@@ -36,3 +36,14 @@ $ sudo yum upgrade python*
 
 To verify a successful Docker Compose installation, run:
 $ docker-compose version
+
+[Step 3 - Install Docker Compose (alternative)]
+Before downloading the Compose binary visit the Compose repository release page on GitHub and check if there is a new version available for download (https://github.com/docker/compose/releases).
+Start by downloading the Docker Compose binary into the /usr/bin directory using the following curl command:
+$ sudo curl -L "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/bin/docker-compose
+
+Once the download is complete, make the binary executable by typing:
+$ sudo chmod +x /usr/bin/docker-compose
+
+To verify the installation type the following command to print the Compose version:
+$ docker-compose --version
