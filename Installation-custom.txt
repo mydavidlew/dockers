@@ -108,6 +108,7 @@ Docker-Drools Business-Central Workbench
 >> ./add-user.sh -a -u kieserver -p kieserver -ro admin,kiemgmt,kie-server,rest-all,analyst,developer,manager,user
 
 Docker-Hadoop
+>> Big Data Europe Integrator Platform (BDI) --> https://github.com/big-data-europe/docker-hadoop
 >> docker-compose -f hadoop/docker-compose.yml up -d
 >> docker-compose -f hadoop/docker-compose.yml rm -fsv
 >> docker-compose -f hadoop/docker-compose.yml restart <service>
