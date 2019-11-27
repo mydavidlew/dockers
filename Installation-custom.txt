@@ -108,9 +108,18 @@ Docker-Drools Business-Central Workbench
 >> ./add-user.sh -a -u kieserver -p kieserver -ro admin,kiemgmt,kie-server,rest-all,analyst,developer,manager,user
 
 Docker-Hadoop
->> docker pull sequenceiq/hadoop-docker
->> docker run -it sequenceiq/hadoop-docker:latest /etc/bootstrap.sh -bash
->> docker run --rm --name=hadoop1 -p 9000:9000 -p 8088:8088 -p 50070:50070 -it sequenceiq/hadoop-docker:latest /etc/bootstrap.sh -bash
->> docker logs hadoop1
->> docker exec -it hadoop1 bash
->> docker stop hadoop1
+>> docker-compose -f hadoop/docker-compose.yml up -d
+>> docker-compose -f hadoop/docker-compose.yml stop
+>> docker-compose -f hadoop/docker-compose.yml rm -fsv
+>> docker-compose -f hadoop/docker-compose.yml logs -f
+>> docker-compose -f hadoop/docker-compose.yml restart <service>
+>> docker-compose -f hadoop/docker-compose.yml exec <service> bash
+>>
+>> Hadoop <services> List
+>> namenode --> bde2020/hadoop-namenode:2.0.0-hadoop3.1.3-java8
+>> datanode1 --> bde2020/hadoop-datanode:2.0.0-hadoop3.1.3-java8
+>> datanode2 --> bde2020/hadoop-datanode:2.0.0-hadoop3.1.3-java8
+>> datanode3 --> bde2020/hadoop-datanode:2.0.0-hadoop3.1.3-java8
+>> nodemanager1 --> bde2020/hadoop-nodemanager:2.0.0-hadoop3.1.3-java8
+>> historyserver --> bde2020/hadoop-historyserver:2.0.0-hadoop3.1.3-java8
+>> resourcemanager --> bde2020/hadoop-resourcemanager:2.0.0-hadoop3.1.3-java8
