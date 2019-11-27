@@ -68,8 +68,44 @@ services:
     env_file:
       - ./hadoop.env
     ports:
+      - 8041:8042
+
+  nodemanager2:
+    image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.1.3-java8
+    container_name: nodemanager2
+    depends_on:
+      - namenode
+      - datanode1
+      - datanode2
+      - datanode3
+      - resourcemanager
+    networks:
+      - networks1
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 datanode1:9864 datanode2:9864 datanode3:9864 resourcemanager:8088"
+    env_file:
+      - ./hadoop.env
+    ports:
       - 8042:8042
-  
+
+  nodemanager3:
+    image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.1.3-java8
+    container_name: nodemanager3
+    depends_on:
+      - namenode
+      - datanode1
+      - datanode2
+      - datanode3
+      - resourcemanager
+    networks:
+      - networks1
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 datanode1:9864 datanode2:9864 datanode3:9864 resourcemanager:8088"
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 8043:8042
+
   datanode1:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.1.3-java8
     container_name: datanode1
@@ -126,8 +162,7 @@ networks:
 
 # URL Paths for Hadoop Services
 # Namenode: http://<dockerhadoop_IP_address>:9870/dfshealth.html#tab-overview
-# History server: http://<dockerhadoop_IP_address>:8188/applicationhistory
-# Datanode: http://<dockerhadoop_IP_address>:9864/
-# Nodemanager: http://<dockerhadoop_IP_address>:8042/node
 # Resource manager: http://<dockerhadoop_IP_address>:8088/
-
+# History server: http://<dockerhadoop_IP_address>:8188/applicationhistory
+# Nodemanager: http://<dockerhadoop_IP_address>:8042/node
+# Datanode: http://<dockerhadoop_IP_address>:9864/
