@@ -109,11 +109,11 @@ Docker-Drools Business-Central Workbench
 
 Docker-Hadoop
 >> docker-compose -f hadoop/docker-compose.yml up -d
->> docker-compose -f hadoop/docker-compose.yml stop
 >> docker-compose -f hadoop/docker-compose.yml rm -fsv
->> docker-compose -f hadoop/docker-compose.yml logs -f
 >> docker-compose -f hadoop/docker-compose.yml restart <service>
+>> docker-compose -f hadoop/docker-compose.yml logs -f
 >> docker-compose -f hadoop/docker-compose.yml exec <service> bash
+>> docker-compose -f hadoop/docker-compose.yml stop
 >>
 >> Hadoop <services> List
 >> namenode --> bde2020/hadoop-namenode:2.0.0-hadoop3.1.3-java8
