@@ -40,7 +40,7 @@ $ docker-compose version
 [Step 3 - Install Docker Compose (alternative)]
 Before downloading the Compose binary visit the Compose repository release page on GitHub and check if there is a new version available for download (https://github.com/docker/compose/releases).
 Start by downloading the Docker Compose binary into the /usr/bin directory using the following curl command:
-$ sudo curl -L "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/bin/docker-compose
+$ sudo curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/bin/docker-compose
 
 Once the download is complete, make the binary executable by typing:
 $ sudo chmod +x /usr/bin/docker-compose
