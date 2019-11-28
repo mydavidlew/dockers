@@ -130,6 +130,9 @@ Docker-Hadoop
 >> URL Paths for Hadoop Services
 >> Namenode: http://10.0.1.54:9870/dfshealth.html#tab-overview
 >> Resource manager: http://10.0.1.54:8088/
+>> History server: http://10.0.1.54:8188/applicationhistory
+>> Nodemanager: http://10.0.1.54:8042/node
+>> Datanode: http://10.0.1.54:9864/
 >> RM Cluster Information API: http://10.0.1.54:8088/ws/v1/cluster/info
 >> RM Cluster Metrics API: http://10.0.1.54:8088/ws/v1/cluster/metrics
 >> RM Cluster Scheduler API: http://10.0.1.54:8088/ws/v1/cluster/scheduler
@@ -141,8 +144,10 @@ Docker-Hadoop
 >> RM Cluster Nodes API: http://10.0.1.54:8088/ws/v1/cluster/nodes/{nodeid}
 >> RM Cluster New Application API: http://10.0.1.54:8088/ws/v1/cluster/apps/new-application
 >> RM Cluster Application State API: http://10.0.1.54:8088/ws/v1/cluster/apps/{appid}/state
->> RM Cluster Information API: http://10.0.1.54:8088/ws/v1/cluster/info
->> RM Cluster Information API: http://10.0.1.54:8088/ws/v1/cluster/info
->> History server: http://10.0.1.54:8188/applicationhistory
->> Nodemanager: http://10.0.1.54:8042/node
->> Datanode: http://10.0.1.54:9864/
+>> RM Cluster Application Queue API: http://10.0.1.54:8088/ws/v1/cluster/apps/{appid}/queue
+>> RM Cluster Application Priority API: http://10.0.1.54:8088/ws/v1/cluster/apps/{appid}/priority
+>> RM Cluster Delegation Tokens (create) API: http://10.0.1.54:8088/ws/v1/cluster/delegation-token
+>> RM Cluster Delegation Tokens (renew) API: http://10.0.1.54:8088/ws/v1/cluster/delegation-token/expiration
+>> RM Cluster Reservation API: http://10.0.1.54:8088/ws/v1/cluster/reservation
+>> RM Cluster Application Timeouts API: http://10.0.1.54:8088/ws/v1/cluster/apps/{appid}/timeouts
+>> RM Scheduler Configuration Mutation API: http://10.0.1.54:8088/ws/v1/cluster/scheduler-conf
