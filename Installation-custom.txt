@@ -122,5 +122,27 @@ Docker-Hadoop
 >> datanode2 --> bde2020/hadoop-datanode:2.0.0-hadoop3.1.3-java8
 >> datanode3 --> bde2020/hadoop-datanode:2.0.0-hadoop3.1.3-java8
 >> nodemanager1 --> bde2020/hadoop-nodemanager:2.0.0-hadoop3.1.3-java8
+>> nodemanager2 --> bde2020/hadoop-nodemanager:2.0.0-hadoop3.1.3-java8
+>> nodemanager3 --> bde2020/hadoop-nodemanager:2.0.0-hadoop3.1.3-java8
 >> historyserver --> bde2020/hadoop-historyserver:2.0.0-hadoop3.1.3-java8
 >> resourcemanager --> bde2020/hadoop-resourcemanager:2.0.0-hadoop3.1.3-java8
+>>
+>> URL Paths for Hadoop Services
+>> Namenode: http://10.0.1.54:9870/dfshealth.html#tab-overview
+>> Resource manager: http://10.0.1.54:8088/
+>> RM Cluster Information API: http://10.0.1.54:8088/ws/v1/cluster/info
+>> RM Cluster Metrics API: http://10.0.1.54:8088/ws/v1/cluster/metrics
+>> RM Cluster Scheduler API: http://10.0.1.54:8088/ws/v1/cluster/scheduler
+>> RM Cluster Applications API: http://10.0.1.54:8088/ws/v1/cluster/apps/{appid}
+>> RM Cluster Application Statistics API: http://10.0.1.54:8088/ws/v1/cluster/appstatistics
+>> RM Cluster Application Attempts API: http://10.0.1.54:8088/ws/v1/cluster/apps/{appid}/appattempts
+>> RM Containers for an Application Attempt API: http://10.0.1.54:8088/ws/v1/cluster/apps/{appid}/appattempts/{appAttemptId}/containers
+>> RM Specific Container for an Application Attempt API: http://10.0.1.54:8088/ws/v1/cluster/apps/{appid}/appattempts/{appAttemptId}/containers/{containerId}
+>> RM Cluster Nodes API: http://10.0.1.54:8088/ws/v1/cluster/nodes/{nodeid}
+>> RM Cluster New Application API: http://10.0.1.54:8088/ws/v1/cluster/apps/new-application
+>> RM Cluster Application State API: http://10.0.1.54:8088/ws/v1/cluster/apps/{appid}/state
+>> RM Cluster Information API: http://10.0.1.54:8088/ws/v1/cluster/info
+>> RM Cluster Information API: http://10.0.1.54:8088/ws/v1/cluster/info
+>> History server: http://10.0.1.54:8188/applicationhistory
+>> Nodemanager: http://10.0.1.54:8042/node
+>> Datanode: http://10.0.1.54:9864/
