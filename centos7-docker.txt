@@ -47,3 +47,14 @@ $ sudo chmod +x /usr/bin/docker-compose
 
 To verify the installation type the following command to print the Compose version:
 $ docker-compose --version
+
+[Step 4 - Install Docker Machine (alternative)]
+Before downloading the Machine binary visit the Machine repository release page on GitHub and check if there is a new version available for download (https://github.com/docker/machine/releases).
+Start by downloading the Docker Machine binary into the /usr/bin directory using the following curl command:
+$ sudo curl -L "https://github.com/docker/machine/releases/download/v0.16.2/docker-machine-$(uname -s)-$(uname -m)" -o /usr/bin/docker-machine
+
+Once the download is complete, make the binary executable by typing:
+$ sudo chmod +x /usr/bin/docker-machine
+
+To verify the installation type the following command to print the Compose version:
+$ docker-machine --version
