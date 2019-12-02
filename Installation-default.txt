@@ -14,10 +14,10 @@ Docker-shellrunservers
 [MongoDB]>> docker run --rm --name=mongo1 --network=appnet --env "MONGO_INITDB_ROOT_USERNAME=root" --env "MONGO_INITDB_ROOT_PASSWORD=password" --mount type=bind,src=/Users/davidlew/Docker/mongo/data,dst=/data/db -p 27017:27017 -d mongo
 
 Docker-mysql
->> [https://hub.docker.com/r/mysql/mysql-server]
->> docker pull mysql/mysql-server:latest
->> docker run --rm --name=mysql1 --env "MYSQL_ROOT_PASSWORD=password" -p 3306:3306 -p 33060:33060 -d mysql/mysql-server
->> docker run --rm --name=mysql1 --network=appnet --env "MYSQL_ROOT_PASSWORD=password" --mount type=bind,src=/Users/davidlew/Docker/mysql/etc/my.cnf,dst=/etc/my.cnf --mount type=bind,src=/Users/davidlew/Docker/mysql/data,dst=/var/lib/mysql -p 3306:3306 -d mysql/mysql-server
+>> [https://hub.docker.com/_/mysql]
+>> docker pull mysql:latest
+>> docker run --rm --name=mysql1 --env "MYSQL_ROOT_PASSWORD=password" -p 3306:3306 -p 33060:33060 -d mysql
+>> docker run --rm --name=mysql1 --network=appnet --env "MYSQL_ROOT_PASSWORD=password" --mount type=bind,src=/Users/davidlew/Docker/mysql/etc/my.cnf,dst=/etc/my.cnf --mount type=bind,src=/Users/davidlew/Docker/mysql/data,dst=/var/lib/mysql -p 3306:3306 -d mysql
 >> docker logs mysql1
 >> docker exec -it mysql1 bash
 >> docker exec -it mysql1 mysql -uroot -ppassword
@@ -31,6 +31,7 @@ Docker-mysql
 >> docker exec -it myapp1 mysql --host=mysql1 --user=test --password
 
 Docker-postgresql
+>> [https://hub.docker.com/_/postgres]
 >> docker pull postgres:latest
 >> docker run --rm --name=postgres1 --env "POSTGRES_PASSWORD=password" -p 5432:5432 -d postgres
 >> docker run --rm --name=postgres1 --network=appnet --env "POSTGRES_PASSWORD=password" --mount type=bind,src=/Users/davidlew/Docker/postgres/data,dst=/var/lib/postgresql/data -p 5432:5432 -d postgres
@@ -43,6 +44,7 @@ Docker-postgresql
 >> GRANT ALL PRIVILEGES ON DATABASE postgres TO test WITH GRANT OPTION;
 
 Docker-mongodb
+>> [https://hub.docker.com/_/mongo]
 >> docker pull mongo:latest
 >> docker run --rm --name=mongo1 -p 27017:27017 -d mongo
 >> docker run --rm --name=mongo1 --network=appnet --env "MONGO_INITDB_ROOT_USERNAME=root" --env "MONGO_INITDB_ROOT_PASSWORD=password" --mount type=bind,src=/Users/davidlew/Docker/mongo/data,dst=/data/db -p 27017:27017 -d mongo
@@ -51,6 +53,7 @@ Docker-mongodb
 >> docker stop mongo1
 
 Docker-tomcat
+>> [https://hub.docker.com/_/tomcat]
 >> docker pull tomcat:latest
 >> docker run -it --rm -p 8080:8080 tomcat:latest
 >> docker run --rm --name=tomcat1 -p 8080:8080 -d tomcat
@@ -62,6 +65,7 @@ Docker-tomcat
 >> docker stop tomcat1
 
 Docker-nginx
+>> [https://hub.docker.com/_/nginx]
 >> docker pull nginx:latest
 >> docker run -it --rm -p 80:80 nginx:latest
 >> docker run --rm --name=nginx1 -p 80:80 -d nginx
@@ -73,6 +77,7 @@ Docker-nginx
 >> docker stop nginx1
 
 Docker-redis
+>> [https://hub.docker.com/_/redis]
 >> docker pull redis:latest
 >> docker run -it --rm -p 6379:6379 redis
 >> docker run --rm --name=redis1 -p 6379:6379 -d redis
@@ -82,6 +87,7 @@ Docker-redis
 >> docker stop redis1
 
 Docker-solr
+>> [https://hub.docker.com/_/solr]
 >> docker pull solr:latest
 >> docker run -it --rm -p 8983:8983 solr
 >> docker run --rm --name=solr1 -p 8983:8983 -d solr
