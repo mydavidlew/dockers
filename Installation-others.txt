@@ -1,1 +1,40 @@
+Docker-shellrunservers
+>> docker network create appnet
 
+Docker-metabase
+>> docker pull metabase/metabase:latest
+>> docker run -it --rm -p 3000:3000 metabase/metabase
+>> docker run --rm --name=metabase1 --link postgres1 --link mysql1 -p 3000:3000 -d metabase/metabase
+>> docker run --rm --name=metabase1 --network=appnet --env 'MB_DB_TYPE=postgres' --env 'MB_DB_DBNAME=metabase' --env 'MB_DB_PORT=5432' --env 'MB_DB_USER=postgres' --env 'MB_DB_PASS=password' --env 'MB_DB_HOST=postgres1' -p 3000:3000 -d metabase/metabase
+>> docker run --rm --name=metabase1 --network=appnet --env 'MB_DB_TYPE=mysql' --env 'MB_DB_DBNAME=metabase' --env 'MB_DB_PORT=3306' --env 'MB_DB_USER=root' --env 'MB_DB_PASS=password' --env 'MB_DB_HOST=mysql1' -p 3000:3000 -d metabase/metabase
+>> docker logs metabase1
+>> docker exec -it metabase1 bash
+>> docker stop metabase1
+
+Docker-keenio
+>> git clone https://github.com/keen/dashboards.git keen/dashboards
+>> <cd keen/dashboards>docker build -t keen/dashboards .
+>> docker run -it --rm -p 80:80 keen/dashboards
+>> docker run --rm --name=keenio1 --link postgres1 --link mysql1 -p 80:80 -d keen/dashboards
+>> docker run --rm --name=keenio1 --network=appnet -p 80:80 -d keen/dashboards
+>> docker logs keenio1
+>> docker exec -it keenio1 bash
+>> docker stop keenio1
+
+Docker-superset
+>> git clone https://github.com/apache/incubator-superset/ superset
+>> <cd superset/contrib/docker>docker build -t superset .
+>> docker-compose run --rm --name superset1 superset ./docker-init.sh
+>> docker network connect appnet postgres1
+>> docker network connect appnet redis1
+>> docker-compose up -d
+>> docker logs superset1
+>> docker exec -it superset1 bash
+>> docker stop superset1
+>>
+>> # Initialize the database
+>> docker exec -it superset1 superset db upgrade
+>> # Load some data to play with
+>> docker exec -it superset1 superset load_examples
+>> # Create default roles and permissions
+>> docker exec -it superset1 superset init
