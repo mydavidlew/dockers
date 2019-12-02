@@ -6,12 +6,6 @@ Docker-shellrunservers
 >> docker network connect appnet mongo1
 >> docker network connect appnet redis1
 >> docker network connect appnet solr1
->>
-[MySQL]>> docker run --rm --name=mysql1 --network=appnet --env "MYSQL_ROOT_PASSWORD=password" --mount type=bind,src=/Users/davidlew/Docker/mysql/etc/my.cnf,dst=/etc/my.cnf --mount type=bind,src=/Users/davidlew/Docker/mysql/data,dst=/var/lib/mysql -p 3306:3306 -d mysql/mysql-server
->>
-[PostgreSQL]>> docker run --rm --name=postgres1 --network=appnet --env "POSTGRES_PASSWORD=password" --mount type=bind,src=/Users/davidlew/Docker/postgres/data,dst=/var/lib/postgresql/data -p 5432:5432 -d postgres
->>
-[MongoDB]>> docker run --rm --name=mongo1 --network=appnet --env "MONGO_INITDB_ROOT_USERNAME=root" --env "MONGO_INITDB_ROOT_PASSWORD=password" --mount type=bind,src=/Users/davidlew/Docker/mongo/data,dst=/data/db -p 27017:27017 -d mongo
 
 Docker-mysql
 >> [https://hub.docker.com/_/mysql]
@@ -52,30 +46,6 @@ Docker-mongodb
 >> docker exec -it mongo1 bash
 >> docker stop mongo1
 
-Docker-tomcat
->> [https://hub.docker.com/_/tomcat]
->> docker pull tomcat:latest
->> docker run -it --rm -p 8080:8080 tomcat:latest
->> docker run --rm --name=tomcat1 -p 8080:8080 -d tomcat
->> docker run --rm --name=tomcat2 -p 8081:8080 -d tomcat
->> docker run --rm --name=tomcat3 -p 8082:8080 -d tomcat
->> docker run --rm --name=tomcat1 --network=appnet --mount type=bind,src=/Users/davidlew/Docker/tomcat/conf,dst=/usr/local/tomcat/conf --mount type=bind,src=/Users/davidlew/Docker/tomcat/webapps,dst=/usr/local/tomcat/webapps -p 8080:8080 -d tomcat
->> docker logs tomcat1
->> docker exec -it tomcat1 bash
->> docker stop tomcat1
-
-Docker-nginx
->> [https://hub.docker.com/_/nginx]
->> docker pull nginx:latest
->> docker run -it --rm -p 80:80 nginx:latest
->> docker run --rm --name=nginx1 -p 80:80 -d nginx
->> docker run --rm --name=nginx2 -p 81:80 -d nginx
->> docker run --rm --name=nginx3 -p 82:80 -d nginx
->> docker run --rm --name=nginx1 --network=appnet --mount type=bind,src=/Users/davidlew/Docker/nginx/conf/nginx.conf,dst=/etc/nginx/nginx.conf --mount type=bind,src=/Users/davidlew/Docker/nginx/conf/conf.d,dst=/etc/nginx/conf.d --mount type=bind,src=/Users/davidlew/Docker/nginx/html,dst=/usr/share/nginx/html -p 80:80 -d nginx
->> docker logs nginx1
->> docker exec -it nginx1 bash
->> docker stop nginx1
-
 Docker-redis
 >> [https://hub.docker.com/_/redis]
 >> docker pull redis:latest
@@ -110,6 +80,30 @@ For convenience, there is a single command that starts Solr, creates a collectio
 >> docker exec -it solr1 solr create_core -c newcore
 >> curl http://localhost:8983/solr/newcore/update/csv?stream.file=../sampledata/demo_motac_1.csv&commit=true&separator=%3B&overwrite=true&stream.contentType=application/csv;charset=utf-8
 >> curl 'http://localhost:8983/solr/newcore/update/csv?commit=true&separator=%3B&overwrite=true' --data-binary @../sampledata/demo_motac_1.csv -H 'Content-type:application/csv'
+
+Docker-tomcat
+>> [https://hub.docker.com/_/tomcat]
+>> docker pull tomcat:latest
+>> docker run -it --rm -p 8080:8080 tomcat:latest
+>> docker run --rm --name=tomcat1 -p 8080:8080 -d tomcat
+>> docker run --rm --name=tomcat2 -p 8081:8080 -d tomcat
+>> docker run --rm --name=tomcat3 -p 8082:8080 -d tomcat
+>> docker run --rm --name=tomcat1 --network=appnet --mount type=bind,src=/Users/davidlew/Docker/tomcat/conf,dst=/usr/local/tomcat/conf --mount type=bind,src=/Users/davidlew/Docker/tomcat/webapps,dst=/usr/local/tomcat/webapps -p 8080:8080 -d tomcat
+>> docker logs tomcat1
+>> docker exec -it tomcat1 bash
+>> docker stop tomcat1
+
+Docker-nginx
+>> [https://hub.docker.com/_/nginx]
+>> docker pull nginx:latest
+>> docker run -it --rm -p 80:80 nginx:latest
+>> docker run --rm --name=nginx1 -p 80:80 -d nginx
+>> docker run --rm --name=nginx2 -p 81:80 -d nginx
+>> docker run --rm --name=nginx3 -p 82:80 -d nginx
+>> docker run --rm --name=nginx1 --network=appnet --mount type=bind,src=/Users/davidlew/Docker/nginx/conf/nginx.conf,dst=/etc/nginx/nginx.conf --mount type=bind,src=/Users/davidlew/Docker/nginx/conf/conf.d,dst=/etc/nginx/conf.d --mount type=bind,src=/Users/davidlew/Docker/nginx/html,dst=/usr/share/nginx/html -p 80:80 -d nginx
+>> docker logs nginx1
+>> docker exec -it nginx1 bash
+>> docker stop nginx1
 
 Docker-grafana
 >> docker pull grafana/grafana:latest
