@@ -184,23 +184,19 @@ else
         echo "$(date) $line $$: starting all datastore services"
         check_network
         echo "$(date) $line $$: starting $D_MYSQL"
-        $C_DOCKER --name=$D_MYSQL --network=$D_NETWORK --env "MYSQL_ROOT_PASSWORD=password" $C_MOUNT,src=$L_PATH"/mysql/etc/my.cnf",dst=/etc/my.cnf $C_MOUNT,src=$L_
-PATH"/mysql/data",dst=/var/lib/mysql -p 3306:3306 mysql/mysql-server
+        $C_DOCKER --name=$D_MYSQL --network=$D_NETWORK --env "MYSQL_ROOT_PASSWORD=password" $C_MOUNT,src=$L_PATH"/mysql/etc/my.cnf",dst=/etc/my.cnf $C_MOUNT,src=$L_PATH"/mysql/data",dst=/var/lib/mysql -p 3306:3306 mysql/mysql-server
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_POSTGRES"
-        $C_DOCKER --name=$D_POSTGRES --network=$D_NETWORK --env "POSTGRES_PASSWORD=password" $C_MOUNT,src=$L_PATH"/postgres/data",dst=/var/lib/postgresql/data -p 54
-32:5432 postgres
+        $C_DOCKER --name=$D_POSTGRES --network=$D_NETWORK --env "POSTGRES_PASSWORD=password" $C_MOUNT,src=$L_PATH"/postgres/data",dst=/var/lib/postgresql/data -p 5432:5432 postgres
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_MONGO"
-        $C_DOCKER --name=$D_MONGO --network=$D_NETWORK --env "MONGO_INITDB_ROOT_USERNAME=root" --env "MONGO_INITDB_ROOT_PASSWORD=password" $C_MOUNT,src=$L_PATH"/mon
-go/data",dst=/data/db -p 27017:27017 mongo
+        $C_DOCKER --name=$D_MONGO --network=$D_NETWORK --env "MONGO_INITDB_ROOT_USERNAME=root" --env "MONGO_INITDB_ROOT_PASSWORD=password" $C_MOUNT,src=$L_PATH"/mongo/data",dst=/data/db -p 27017:27017 mongo
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting redis $D_REDIS"
         $C_DOCKER --name=$D_REDIS --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/redis/data",dst=/data -p 6379:6379 redis
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting solr $D_SOLR"
-        $C_DOCKER --name=$D_SOLR --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/solr/data",dst=/opt/solr/server/solr $C_MOUNT,src=$L_PATH"/solr/webapp",dst=/opt/solr/se
-rver/solr-webapp -p 8983:8983 solr
+        $C_DOCKER --name=$D_SOLR --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/solr/data",dst=/opt/solr/server/solr $C_MOUNT,src=$L_PATH"/solr/webapp",dst=/opt/solr/server/solr-webapp -p 8983:8983 solr
         sleep $SLEEP_INT
     elif [[ $# -eq 1 && $1 == $CMD_STOP ]] ; then
         echo "$(date) $line $$: stopping all running services"
@@ -216,20 +212,16 @@ rver/solr-webapp -p 8983:8983 solr
         $C_DOCKER --name=$D_NODE --network=$D_NETWORK -p 9100:9100 prom/node-exporter
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_ADVISOR"
-        $C_DOCKER --name=$D_ADVISOR --network=$D_NETWORK $C_MOUNT,src=/,dst=/rootfs $C_MOUNT,src=/var/run,dst=/var/run $C_MOUNT,src=/sys,dst=/sys $C_MOUNT,src=/var/
-lib/docker/,dst=/var/lib/docker -p 9109:8080 google/cadvisor
+        $C_DOCKER --name=$D_ADVISOR --network=$D_NETWORK $C_MOUNT,src=/,dst=/rootfs $C_MOUNT,src=/var/run,dst=/var/run $C_MOUNT,src=/sys,dst=/sys $C_MOUNT,src=/var/lib/docker/,dst=/var/lib/docker -p 9109:8080 google/cadvisor
         sleep $SLEEP_INT
 #        echo "$(date) $line $$: starting $D_ALERT"
-#        $C_DOCKER --name=$D_ALERT --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/alertmanager/etc/alertmanager.yml",dst=/etc/alertmanager/alertmanager.yml -p 9093:9093
- prom/alertmanager --config.file=/etc/alertmanager/alertmanager.yml
+#        $C_DOCKER --name=$D_ALERT --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/alertmanager/etc/alertmanager.yml",dst=/etc/alertmanager/alertmanager.yml -p 9093:9093 prom/alertmanager --config.file=/etc/alertmanager/alertmanager.yml
 #        sleep $SLEEP_INT
 #        echo "$(date) $line $$: starting $D_PROMETHEUS"
-#        $C_DOCKER --name=$D_PROMETHEUS --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/prometheus/etc/prometheus.yml",dst=/etc/prometheus/prometheus.yml $C_MOUNT,src=$L
-_PATH"/prometheus/etc/alert_rules.yml",dst=/etc/prometheus/alert_rules.yml -p 9090:9090 prom/prometheus
+#        $C_DOCKER --name=$D_PROMETHEUS --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/prometheus/etc/prometheus.yml",dst=/etc/prometheus/prometheus.yml $C_MOUNT,src=$L_PATH"/prometheus/etc/alert_rules.yml",dst=/etc/prometheus/alert_rules.yml -p 9090:9090 prom/prometheus
 #        sleep $SLEEP_INT
 #        echo "$(date) $line $$: starting $D_GRAFANA"
-#        $C_DOCKER --name=$D_GRAFANA --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/grafana/conf/grafana.ini",dst=/etc/grafana/grafana.ini $C_MOUNT,src=$L_PATH"/grafana
-/data",dst=/var/lib/grafana -p 3000:3000 grafana/grafana
+#        $C_DOCKER --name=$D_GRAFANA --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/grafana/conf/grafana.ini",dst=/etc/grafana/grafana.ini $C_MOUNT,src=$L_PATH"/grafana/data",dst=/var/lib/grafana -p 3000:3000 grafana/grafana
 #        sleep $SLEEP_INT
     elif [[ $# -eq 1 && $1 == $CMD_STOP_MON ]] ; then
         echo "$(date) $line $$: stopping all monitoring services"
@@ -383,21 +375,16 @@ else
         echo "$(date) $line $$: starting all monitoring services"
         check_network
         echo "$(date) $line $$: starting $D_CON1"
-        $C_DOCKER --name=$D_CON1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/elasticsearch/conf",dst=/usr/share/elasticsearch/config $C_MOUNT,src=$L_PATH"/elasticse
-arch/data",dst=/usr/share/elasticsearch/data --env "discovery.type=single-node" --env "cluster.name=elastic-cluster" -p 9200:9200 -p 9300:9300 docker.elastic.co/el
-asticsearch/elasticsearch:7.2.0
+        $C_DOCKER --name=$D_CON1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/elasticsearch/conf",dst=/usr/share/elasticsearch/config $C_MOUNT,src=$L_PATH"/elasticsearch/data",dst=/usr/share/elasticsearch/data --env "discovery.type=single-node" --env "cluster.name=elastic-cluster" -p 9200:9200 -p 9300:9300 docker.elastic.co/elasticsearch/elasticsearch:7.2.0
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_CON2"
-        $C_DOCKER --name=$D_CON2 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/kibana/conf",dst=/usr/share/kibana/config --link $D_CON1:$D_ES1 -p 5601:5601 docker.ela
-stic.co/kibana/kibana:7.2.0
+        $C_DOCKER --name=$D_CON2 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/kibana/conf",dst=/usr/share/kibana/config --link $D_CON1:$D_ES1 -p 5601:5601 docker.elastic.co/kibana/kibana:7.2.0
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_CON3"
-        $C_DOCKER --name=$D_CON3 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/logstash/conf",dst=/usr/share/logstash/config $C_MOUNT,src=$L_PATH"/logstash/pipeline",
-dst=/usr/share/logstash/pipeline --link $D_CON1:$D_ES1 -p 5044:5044 docker.elastic.co/logstash/logstash:7.2.0
+        $C_DOCKER --name=$D_CON3 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/logstash/conf",dst=/usr/share/logstash/config $C_MOUNT,src=$L_PATH"/logstash/pipeline",dst=/usr/share/logstash/pipeline --link $D_CON1:$D_ES1 -p 5044:5044 docker.elastic.co/logstash/logstash:7.2.0
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_CON4"
-        $C_DOCKER --name=$D_CON4 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/filebeat/conf/filebeat.yml",dst=/usr/share/filebeat/filebeat.yml $C_MOUNT,src=$L_PATH"/
-filebeat/vmlog",dst=/usr/share/filebeat/logs --link $D_CON1:$D_ES1 --link $D_CON2:$D_KI1 --link $D_CON3:$D_LS1 docker.elastic.co/beats/filebeat:7.2.0
+        $C_DOCKER --name=$D_CON4 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/filebeat/conf/filebeat.yml",dst=/usr/share/filebeat/filebeat.yml $C_MOUNT,src=$L_PATH"/filebeat/vmlog",dst=/usr/share/filebeat/logs --link $D_CON1:$D_ES1 --link $D_CON2:$D_KI1 --link $D_CON3:$D_LS1 docker.elastic.co/beats/filebeat:7.2.0
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_CON5"
         $C_DOCKER --name=$D_CON5 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/null",dst=/null -p 0000:0000 null
