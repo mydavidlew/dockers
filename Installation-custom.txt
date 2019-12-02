@@ -56,9 +56,9 @@ Docker-Drools KIE Execution Server
 >> ["JAVA_OPTS=$JAVA_OPTS
 >>   -Dorg.kie.server.id=kie-server1
 >>   -Dorg.kie.server.user=kieserver -Dorg.kie.server.pwd=kieserver
+>>   -Dorg.kie.server.controller.user=kieserver -Dorg.kie.server.controller.pwd=kieserver
 >>   -Dorg.kie.server.location=http://kie-server1:8081/kie-server/services/rest/server
 >>   -Dorg.kie.server.controller=ws://kie-workbench1:8080/business-central/websocket/controller
->>   -Dorg.kie.server.controller.user=kieserver -Dorg.kie.server.controller.pwd=kieserver
 >> "]
 >> docker pull jboss/kie-server:7.29.0.Final
 >> docker run -it --rm --name=kie-server1 --network=appnet --env "KIE_SERVER_PROFILE=standalone-full" --link kie-workbench1:business-central-workbench -p 8081:8080 jboss/kie-server:7.29.0.Final
@@ -83,9 +83,9 @@ Docker-Drools KIE Execution Server
 Docker-Drools Business-Central Workbench
 >> ["JAVA_OPTS=$JAVA_OPTS
 >>   -Dorg.kie.server.user=kieserver -Dorg.kie.server.pwd=kieserver
+>>   -Dorg.kie.workbench.controller.user=kieserver -Dorg.kie.workbench.controller.pwd=kieserver
 >>   ###-Dorg.kie.workbench.controller=ws://kie-server1:8080/kie-server/websocket/controller
 >>   ###-Dorg.kie.server.controller=ws://kie-workbench1:8080/business-central/websocket/controller
->>   -Dorg.kie.workbench.controller.user=kieserver -Dorg.kie.workbench.controller.pwd=kieserver
 >> "]
 >> docker pull jboss/business-central-workbench:7.29.0.Final
 >> docker run -it --rm --name=kie-workbench1 --network=appnet --env "KIE_SERVER_PROFILE=standalone-full" --link kie-server1:kie-server -p 8080:8080 -p 8001:8001 jboss/business-central-workbench:7.29.0.Final
@@ -133,21 +133,3 @@ Docker-Hadoop
 >> History server: http://10.0.1.54:8188/applicationhistory
 >> Nodemanager: http://10.0.1.54:8042/node
 >> Datanode: http://10.0.1.54:9864/
->> RM Cluster Information API: http://10.0.1.54:8088/ws/v1/cluster/info
->> RM Cluster Metrics API: http://10.0.1.54:8088/ws/v1/cluster/metrics
->> RM Cluster Scheduler API: http://10.0.1.54:8088/ws/v1/cluster/scheduler
->> RM Cluster Applications API: http://10.0.1.54:8088/ws/v1/cluster/apps/{appid}
->> RM Cluster Application Statistics API: http://10.0.1.54:8088/ws/v1/cluster/appstatistics
->> RM Cluster Application Attempts API: http://10.0.1.54:8088/ws/v1/cluster/apps/{appid}/appattempts
->> RM Containers for an Application Attempt API: http://10.0.1.54:8088/ws/v1/cluster/apps/{appid}/appattempts/{appAttemptId}/containers
->> RM Specific Container for an Application Attempt API: http://10.0.1.54:8088/ws/v1/cluster/apps/{appid}/appattempts/{appAttemptId}/containers/{containerId}
->> RM Cluster Nodes API: http://10.0.1.54:8088/ws/v1/cluster/nodes/{nodeid}
->> RM Cluster New Application API: http://10.0.1.54:8088/ws/v1/cluster/apps/new-application
->> RM Cluster Application State API: http://10.0.1.54:8088/ws/v1/cluster/apps/{appid}/state
->> RM Cluster Application Queue API: http://10.0.1.54:8088/ws/v1/cluster/apps/{appid}/queue
->> RM Cluster Application Priority API: http://10.0.1.54:8088/ws/v1/cluster/apps/{appid}/priority
->> RM Cluster Delegation Tokens (create) API: http://10.0.1.54:8088/ws/v1/cluster/delegation-token
->> RM Cluster Delegation Tokens (renew) API: http://10.0.1.54:8088/ws/v1/cluster/delegation-token/expiration
->> RM Cluster Reservation API: http://10.0.1.54:8088/ws/v1/cluster/reservation
->> RM Cluster Application Timeouts API: http://10.0.1.54:8088/ws/v1/cluster/apps/{appid}/timeouts
->> RM Scheduler Configuration Mutation API: http://10.0.1.54:8088/ws/v1/cluster/scheduler-conf
