@@ -177,7 +177,3 @@ Docker-superset
 >> docker exec -it superset1 superset load_examples
 >> # Create default roles and permissions
 >> docker exec -it superset1 superset init
-
-
-
-
