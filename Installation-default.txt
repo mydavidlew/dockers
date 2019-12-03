@@ -65,6 +65,7 @@ Docker-solr
 >> docker run --rm --name=solr1 --network=appnet --mount type=bind,src=/opt/docker/solr/data,dst=/var/solr/data -p 8983:8983 -d solr
 >> docker logs solr1
 >> docker exec -it solr1 bash
+>> docker exec -it solr1 solr solr-precreate mycore
 >> docker stop solr1
 >>
 <<Run Solr to index example data>>
