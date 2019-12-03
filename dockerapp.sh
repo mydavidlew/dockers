@@ -45,7 +45,7 @@ else
         echo "$(date) $line $$: starting all datastore services"
         check_network
         echo "$(date) $line $$: starting $D_MY1"
-        $C_DOCKER --name=$D_MY1 --network=$D_NETWORK --env "MYSQL_ROOT_PASSWORD=password" $C_MOUNT,src=$L_PATH"/mysql/etc/my.cnf",dst=/etc/my.cnf $C_MOUNT,src=$L_PATH"/mysql/data",dst=/var/lib/mysql -p 3306:3306 mysql
+        $C_DOCKER --name=$D_MY1 --network=$D_NETWORK --env "MYSQL_ROOT_PASSWORD=password" $C_MOUNT,src=$L_PATH"/mysql/data",dst=/var/lib/mysql -p 3306:3306 mysql
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_PG1"
         $C_DOCKER --name=$D_PG1 --network=$D_NETWORK --env "POSTGRES_PASSWORD=password" $C_MOUNT,src=$L_PATH"/postgres/data",dst=/var/lib/postgresql/data -p 5432:5432 postgres
