@@ -61,8 +61,8 @@ Docker-solr
 >> docker pull solr:latest
 >> docker run -it --rm -p 8983:8983 solr
 >> docker run --rm --name=solr1 -p 8983:8983 -d solr
->> docker run --rm --name=solr1 --network=appnet --mount type=bind,src=/opt/docker/solr/data,dst=/opt/solr/server/solr --mount type=bind,src=/opt/docker/solr/webapp,dst=/opt/solr/server/solr-webapp -p 8983:8983 -d solr solr-precreate mycore
->> docker run --rm --name=solr1 --network=appnet --mount type=bind,src=/opt/docker/solr/data,dst=/opt/solr/server/solr --mount type=bind,src=/opt/docker/solr/webapp,dst=/opt/solr/server/solr-webapp -p 8983:8983 -d solr
+>> docker run --rm --name=solr1 --network=appnet --mount type=bind,src=/opt/docker/solr/data,dst=/var/solr/data -p 8983:8983 -d solr solr-precreate mycore
+>> docker run --rm --name=solr1 --network=appnet --mount type=bind,src=/opt/docker/solr/data,dst=/var/solr/data -p 8983:8983 -d solr
 >> docker logs solr1
 >> docker exec -it solr1 bash
 >> docker stop solr1
