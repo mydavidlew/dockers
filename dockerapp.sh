@@ -57,7 +57,7 @@ else
         $C_DOCKER --name=$D_RD1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/redis/data",dst=/data -p 6379:6379 redis
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_SL1"
-        $C_DOCKER --name=$D_SL1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/solr/data",dst=/opt/solr/server/solr $C_MOUNT,src=$L_PATH"/solr/webapp",dst=/opt/solr/server/solr-webapp -p 8983:8983 solr
+        $C_DOCKER --name=$D_SL1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/solr/data",dst=/var/solr/data -p 8983:8983 solr
         sleep $SLEEP_INT
     elif [[ $# -eq 1 && $1 == $CMD_STOP_DS ]] ; then
         echo "$(date) $line $$: stopping all datastore services"
