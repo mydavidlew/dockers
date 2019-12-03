@@ -70,7 +70,7 @@ Docker-solr
 <<Run Solr to index example data>>
 To use Solr, you need to create a "core", an index for your data. In the web UI if you click on "Core Admin" you should now see the "gettingstarted" core.
 >> docker exec -it solr1 solr create_core -c gettingstarted
-f you want to load some of the example data that is included in the container. In the UI, find the "Core selector" popup menu and select the "gettingstarted" core, then select the "Query" menu item.
+If you want to load some of the example data that is included in the container. In the UI, find the "Core selector" popup menu and select the "gettingstarted" core, then select the "Query" menu item.
 >> docker exec -it solr1 post -c gettingstarted example/exampledocs/manufacturers.xml
 >>
 <<Single-command demo>>
