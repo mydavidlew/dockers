@@ -45,19 +45,19 @@ else
         echo "$(date) $line $$: starting all datastore services"
         check_network
         echo "$(date) $line $$: starting $D_MY1"
-        $C_DOCKER --name=$D_MY1 --network=$D_NETWORK --env "MYSQL_ROOT_PASSWORD=password" $C_MOUNT,src=$L_PATH"/mysql/data",dst=/var/lib/mysql -p 3306:3306 mysql
+        $C_DOCKER --hostname=$D_MY1.local --name=$D_MY1 --network=$D_NETWORK --env "MYSQL_ROOT_PASSWORD=password" $C_MOUNT,src=$L_PATH"/mysql/data",dst=/var/lib/mysql -p 3306:3306 mysql
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_PG1"
-        $C_DOCKER --name=$D_PG1 --network=$D_NETWORK --env "POSTGRES_PASSWORD=password" $C_MOUNT,src=$L_PATH"/postgres/data",dst=/var/lib/postgresql/data -p 5432:5432 postgres
+        $C_DOCKER --hostname=$D_PG1.local --name=$D_PG1 --network=$D_NETWORK --env "POSTGRES_PASSWORD=password" $C_MOUNT,src=$L_PATH"/postgres/data",dst=/var/lib/postgresql/data -p 5432:5432 postgres
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_MG1"
-        $C_DOCKER --name=$D_MG1 --network=$D_NETWORK --env "MONGO_INITDB_ROOT_USERNAME=root" --env "MONGO_INITDB_ROOT_PASSWORD=password" $C_MOUNT,src=$L_PATH"/mongo/data",dst=/data/db -p 27017:27017 mongo
+        $C_DOCKER --hostname=$D_MG1.local --name=$D_MG1 --network=$D_NETWORK --env "MONGO_INITDB_ROOT_USERNAME=root" --env "MONGO_INITDB_ROOT_PASSWORD=password" $C_MOUNT,src=$L_PATH"/mongo/data",dst=/data/db -p 27017:27017 mongo
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_RD1"
-        $C_DOCKER --name=$D_RD1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/redis/data",dst=/data -p 6379:6379 redis
+        $C_DOCKER --hostname=$D_RD1.local --name=$D_RD1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/redis/data",dst=/data -p 6379:6379 redis
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_SL1"
-        $C_DOCKER --name=$D_SL1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/solr/data",dst=/var/solr/data -p 8983:8983 solr
+        $C_DOCKER --hostname=$D_SL1.local --name=$D_SL1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/solr/data",dst=/var/solr/data -p 8983:8983 solr
         sleep $SLEEP_INT
     elif [[ $# -eq 1 && $1 == $CMD_STOP_DS ]] ; then
         echo "$(date) $line $$: stopping all datastore services"
@@ -67,13 +67,13 @@ else
         echo "$(date) $line $$: starting all monitor agent services"
         check_network
         echo "$(date) $line $$: starting $D_CE1"
-        $C_DOCKER --name=$D_CE1 --network=$D_NETWORK $C_MOUNT,src=/var/run/docker.sock,dst=/var/run/docker.sock -p 9104:9104 prom/container-exporter
+        $C_DOCKER --hostname=$D_CE1.local --name=$D_CE1 --network=$D_NETWORK $C_MOUNT,src=/var/run/docker.sock,dst=/var/run/docker.sock -p 9104:9104 prom/container-exporter
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_NE1"
-        $C_DOCKER --name=$D_NE1 --network=$D_NETWORK -p 9100:9100 prom/node-exporter
+        $C_DOCKER --hostname=$D_NE1.local --name=$D_NE1 --network=$D_NETWORK -p 9100:9100 prom/node-exporter
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_CA1"
-        $C_DOCKER --name=$D_CA1 --network=$D_NETWORK $C_MOUNT,src=/,dst=/rootfs $C_MOUNT,src=/var/run,dst=/var/run $C_MOUNT,src=/sys,dst=/sys $C_MOUNT,src=/var/lib/docker/,dst=/var/lib/docker -p 9109:8080 google/cadvisor
+        $C_DOCKER --hostname=$D_CA1.local --name=$D_CA1 --network=$D_NETWORK $C_MOUNT,src=/,dst=/rootfs $C_MOUNT,src=/var/run,dst=/var/run $C_MOUNT,src=/sys,dst=/sys $C_MOUNT,src=/var/lib/docker/,dst=/var/lib/docker -p 9109:8080 google/cadvisor
         sleep $SLEEP_INT
     elif [[ $# -eq 1 && $1 == $CMD_STOP_MA ]] ; then
         echo "$(date) $line $$: stopping all monitor agent services"
@@ -83,13 +83,13 @@ else
         echo "$(date) $line $$: starting all monitor server services"
         check_network
         echo "$(date) $line $$: starting $D_AM1"
-        $C_DOCKER --name=$D_AM1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/alertmanager/etc/alertmanager.yml",dst=/etc/alertmanager/alertmanager.yml -p 9093:9093 prom/alertmanager --config.file=/etc/alertmanager/alertmanager.yml
+        $C_DOCKER --hostname=$D_AM1.local --name=$D_AM1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/alertmanager/etc/alertmanager.yml",dst=/etc/alertmanager/alertmanager.yml -p 9093:9093 prom/alertmanager --config.file=/etc/alertmanager/alertmanager.yml
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_PR1"
-        $C_DOCKER --name=$D_PR1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/prometheus/etc/prometheus.yml",dst=/etc/prometheus/prometheus.yml $C_MOUNT,src=$L_PATH"/prometheus/etc/alert_rules.yml",dst=/etc/prometheus/alert_rules.yml -p 9090:9090 prom/prometheus
+        $C_DOCKER --hostname=$D_PR1.local --name=$D_PR1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/prometheus/etc/prometheus.yml",dst=/etc/prometheus/prometheus.yml $C_MOUNT,src=$L_PATH"/prometheus/etc/alert_rules.yml",dst=/etc/prometheus/alert_rules.yml -p 9090:9090 prom/prometheus
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_GR1"
-        $C_DOCKER --name=$D_GR1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/grafana/conf/grafana.ini",dst=/etc/grafana/grafana.ini $C_MOUNT,src=$L_PATH"/grafana/data",dst=/var/lib/grafana -p 3000:3000 grafana/grafana
+        $C_DOCKER --hostname=$D_GR1.local --name=$D_GR1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/grafana/conf/grafana.ini",dst=/etc/grafana/grafana.ini $C_MOUNT,src=$L_PATH"/grafana/data",dst=/var/lib/grafana -p 3000:3000 grafana/grafana
         sleep $SLEEP_INT
     elif [[ $# -eq 1 && $1 == $CMD_STOP_MS ]] ; then
         echo "$(date) $line $$: stopping all monitor server services"
@@ -99,16 +99,16 @@ else
         echo "$(date) $line $$: starting all elastic stack services"
         check_network
         echo "$(date) $line $$: starting $D_ES1"
-        $C_DOCKER --name=$D_ES1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/elasticsearch/conf",dst=/usr/share/elasticsearch/config $C_MOUNT,src=$L_PATH"/elasticsearch/data",dst=/usr/share/elasticsearch/data --env "discovery.type=single-node" --env "cluster.name=elastic-cluster" -p 9200:9200 -p 9300:9300 docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+        $C_DOCKER --hostname=$D_ES1.local --name=$D_ES1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/elasticsearch/conf",dst=/usr/share/elasticsearch/config $C_MOUNT,src=$L_PATH"/elasticsearch/data",dst=/usr/share/elasticsearch/data --env "discovery.type=single-node" --env "cluster.name=elastic-cluster" -p 9200:9200 -p 9300:9300 docker.elastic.co/elasticsearch/elasticsearch:7.2.0
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_KI1"
-        $C_DOCKER --name=$D_KI1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/kibana/conf",dst=/usr/share/kibana/config --link $D_ES1:$L_ES1 -p 5601:5601 docker.elastic.co/kibana/kibana:7.2.0
+        $C_DOCKER --hostname=$D_KI1.local --name=$D_KI1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/kibana/conf",dst=/usr/share/kibana/config --link $D_ES1:$L_ES1 -p 5601:5601 docker.elastic.co/kibana/kibana:7.2.0
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_LS1"
-        $C_DOCKER --name=$D_LS1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/logstash/conf",dst=/usr/share/logstash/config $C_MOUNT,src=$L_PATH"/logstash/pipeline",dst=/usr/share/logstash/pipeline --link $D_ES1:$L_ES1 -p 5044:5044 -p 9600:9600 docker.elastic.co/logstash/logstash:7.2.0
+        $C_DOCKER --hostname=$D_LS1.local --name=$D_LS1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/logstash/conf",dst=/usr/share/logstash/config $C_MOUNT,src=$L_PATH"/logstash/pipeline",dst=/usr/share/logstash/pipeline --link $D_ES1:$L_ES1 -p 5044:5044 -p 9600:9600 docker.elastic.co/logstash/logstash:7.2.0
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_FB1"
-        $C_DOCKER --name=$D_FB1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/filebeat/conf/filebeat.yml",dst=/usr/share/filebeat/filebeat.yml $C_MOUNT,src=$L_PATH"/filebeat/vmlog",dst=/usr/share/filebeat/logs --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/filebeat:7.2.0
+        $C_DOCKER --hostname=$D_FB1.local --name=$D_FB1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/filebeat/conf/filebeat.yml",dst=/usr/share/filebeat/filebeat.yml $C_MOUNT,src=$L_PATH"/filebeat/vmlog",dst=/usr/share/filebeat/logs --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/filebeat:7.2.0
         sleep $SLEEP_INT
     elif [[ $# -eq 1 && $1 == $CMD_STOP_ES ]] ; then
         echo "$(date) $line $$: stopping all elastic stack services"
@@ -118,10 +118,10 @@ else
         echo "$(date) $line $$: starting all drools engine services"
         check_network
         echo "$(date) $line $$: starting $D_BC1"
-        $C_DOCKER --name=$D_BC1 --network=$D_NETWORK --env "KIE_SERVER_PROFILE=standalone-full" --link $D_KS1:$L_KS1 $C_MOUNT,src=$L_PATH"/kie-workbench/conf/mgmt-users.properties",dst=/opt/jboss/wildfly/standalone/configuration/mgmt-users.properties $C_MOUNT,src=$L_PATH"/kie-workbench/conf/mgmt-groups.properties",dst=/opt/jboss/wildfly/standalone/configuration/mgmt-groups.properties $C_MOUNT,src=$L_PATH"/kie-workbench/conf/application-users.properties",dst=/opt/jboss/wildfly/standalone/configuration/application-users.properties $C_MOUNT,src=$L_PATH"/kie-workbench/conf/application-roles.properties",dst=/opt/jboss/wildfly/standalone/configuration/application-roles.properties $C_MOUNT,src=$L_PATH"/kie-workbench/bin/start_business-central-wb.sh",dst=/opt/jboss/wildfly/bin/start_business-central-wb.sh -p 8080:8080 -p 8001:8001 jboss/business-central-workbench:7.29.0.Final
+        $C_DOCKER --hostname=$D_BC1.local --name=$D_BC1 --network=$D_NETWORK --env "KIE_SERVER_PROFILE=standalone-full" --link $D_KS1:$L_KS1 $C_MOUNT,src=$L_PATH"/kie-workbench/conf/mgmt-users.properties",dst=/opt/jboss/wildfly/standalone/configuration/mgmt-users.properties $C_MOUNT,src=$L_PATH"/kie-workbench/conf/mgmt-groups.properties",dst=/opt/jboss/wildfly/standalone/configuration/mgmt-groups.properties $C_MOUNT,src=$L_PATH"/kie-workbench/conf/application-users.properties",dst=/opt/jboss/wildfly/standalone/configuration/application-users.properties $C_MOUNT,src=$L_PATH"/kie-workbench/conf/application-roles.properties",dst=/opt/jboss/wildfly/standalone/configuration/application-roles.properties $C_MOUNT,src=$L_PATH"/kie-workbench/bin/start_business-central-wb.sh",dst=/opt/jboss/wildfly/bin/start_business-central-wb.sh -p 8080:8080 -p 8001:8001 jboss/business-central-workbench:7.29.0.Final
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_KS1"
-        $C_DOCKER --name=$D_KS1 --network=$D_NETWORK --env "KIE_SERVER_PROFILE=standalone-full" --link $D_BC1:$L_BC1 $C_MOUNT,src=$L_PATH"/kie-server/conf/mgmt-users.properties",dst=/opt/jboss/wildfly/standalone/configuration/mgmt-users.properties $C_MOUNT,src=$L_PATH"/kie-server/conf/mgmt-groups.properties",dst=/opt/jboss/wildfly/standalone/configuration/mgmt-groups.properties $C_MOUNT,src=$L_PATH"/kie-server/conf/application-users.properties",dst=/opt/jboss/wildfly/standalone/configuration/application-users.properties $C_MOUNT,src=$L_PATH"/kie-server/conf/application-roles.properties",dst=/opt/jboss/wildfly/standalone/configuration/application-roles.properties $C_MOUNT,src=$L_PATH"/kie-server/bin/start_kie-wb.sh",dst=/opt/jboss/wildfly/bin/start_kie-wb.sh -p 8081:8080 jboss/kie-server:7.29.0.Final
+        $C_DOCKER --hostname=$D_KS1.local --name=$D_KS1 --network=$D_NETWORK --env "KIE_SERVER_PROFILE=standalone-full" --link $D_BC1:$L_BC1 $C_MOUNT,src=$L_PATH"/kie-server/conf/mgmt-users.properties",dst=/opt/jboss/wildfly/standalone/configuration/mgmt-users.properties $C_MOUNT,src=$L_PATH"/kie-server/conf/mgmt-groups.properties",dst=/opt/jboss/wildfly/standalone/configuration/mgmt-groups.properties $C_MOUNT,src=$L_PATH"/kie-server/conf/application-users.properties",dst=/opt/jboss/wildfly/standalone/configuration/application-users.properties $C_MOUNT,src=$L_PATH"/kie-server/conf/application-roles.properties",dst=/opt/jboss/wildfly/standalone/configuration/application-roles.properties $C_MOUNT,src=$L_PATH"/kie-server/bin/start_kie-wb.sh",dst=/opt/jboss/wildfly/bin/start_kie-wb.sh -p 8081:8080 jboss/kie-server:7.29.0.Final
         sleep $SLEEP_INT
     elif [[ $# -eq 1 && $1 == $CMD_STOP_DE ]] ; then
         echo "$(date) $line $$: stopping all drools engine services"
@@ -131,7 +131,7 @@ else
         echo "$(date) $line $$: starting all XXX services"
         check_network
         echo "$(date) $line $$: starting $D_XX1"
-        $C_DOCKER --name=$D_XX1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/null",dst=/null -p 0000:0000 null
+        $C_DOCKER --hostname=$D_XX1.local --name=$D_XX1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/null",dst=/null -p 0000:0000 null
         sleep $SLEEP_INT
     elif [[ $# -eq 1 && $1 == $CMD_STOP_XX ]] ; then
         echo "$(date) $line $$: stopping all XXX services"
