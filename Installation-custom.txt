@@ -30,7 +30,7 @@ Docker-Kibana
 Docker-Logstash
 >> [https://www.elastic.co/guide/en/logstash/7.2/docker.html]
 >> docker pull docker.elastic.co/logstash/logstash:7.2.0
->> docker run --rm --name=logstash1 --network=appnet --link elastic1:elasticsearch --mount type=bind,src=/opt/docker/logstash/conf,dst=/usr/share/logstash/config --mount type=bind,src=/opt/docker/logstash/pipeline,dst=/usr/share/logstash/pipeline -p 5044:5044 -d docker.elastic.co/logstash/logstash:7.2.0
+>> docker run --rm --name=logstash1 --network=appnet --link elastic1:elasticsearch --mount type=bind,src=/opt/docker/logstash/conf,dst=/usr/share/logstash/config --mount type=bind,src=/opt/docker/logstash/pipeline,dst=/usr/share/logstash/pipeline -p 5044:5044 -p 9600:9600 -d docker.elastic.co/logstash/logstash:7.2.0
 >> docker logs logstash1
 >> docker exec -it logstash1 bash
 >> docker stop logstash1
