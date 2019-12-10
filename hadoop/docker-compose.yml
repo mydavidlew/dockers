@@ -157,20 +157,53 @@ services:
     ports:
       - 8242:8042
 
-  zookeeper:
+  zookeeper1:
     image: zookeeper:3.5.6
-    hostname: zookeeper
-    container_name: zookeeper
+    hostname: zookeeper1
+    container_name: zookeeper1
+    restart: always
     networks:
       - networks1
     environment:
       ZOO_MY_ID: 1
-      ZOO_SERVERS: "server.1=0.0.0.0:2888:3888;2181"
-      ZOO_STANDALONE_ENABLED: "true"
-      ZOO_ADMINSERVER_ENABLED: "true"
+      ZOO_SERVERS: "server.1=0.0.0.0:2888:3888;2181 server.2=zookeeper2:2888:3888;2181 server.3=zookeeper3:2888:3888;2181"
+      #ZOO_STANDALONE_ENABLED: "true"
+      #ZOO_ADMINSERVER_ENABLED: "true"
     ports:
       - 2181:2181
       - 8080:8080
+
+  zookeeper2:
+    image: zookeeper:3.5.6
+    hostname: zookeeper2
+    container_name: zookeeper2
+    restart: always
+    networks:
+      - networks1
+    environment:
+      ZOO_MY_ID: 2
+      ZOO_SERVERS: "server.1=zookeeper1:2888:3888;2181 server.2=0.0.0.0:2888:3888;2181 server.3=zookeeper3:2888:3888;2181"
+      #ZOO_STANDALONE_ENABLED: "true"
+      #ZOO_ADMINSERVER_ENABLED: "true"
+    ports:
+      - 2182:2181
+      - 8081:8080
+
+  zookeeper3:
+    image: zookeeper:3.5.6
+    hostname: zookeeper3
+    container_name: zookeeper3
+    restart: always
+    networks:
+      - networks1
+    environment:
+      ZOO_MY_ID: 3
+      ZOO_SERVERS: "server.1=zookeeper1:2888:3888;2181 server.2=zookeeper2:2888:3888;2181 server.3=0.0.0.0:2888:3888;2181"
+      #ZOO_STANDALONE_ENABLED: "true"
+      #ZOO_ADMINSERVER_ENABLED: "true"
+    ports:
+      - 2183:2181
+      - 8082:8080
 
 volumes:
   hadoop_namenode:
