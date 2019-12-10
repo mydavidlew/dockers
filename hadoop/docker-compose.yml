@@ -157,6 +157,21 @@ services:
     ports:
       - 8242:8042
 
+  zookeeper:
+    image: zookeeper:3.5.6
+    hostname: zookeeper
+    container_name: zookeeper
+    networks:
+      - networks1
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: "server.1=0.0.0.0:2888:3888;2181"
+      ZOO_STANDALONE_ENABLED: "true"
+      ZOO_ADMINSERVER_ENABLED: "true"
+    ports:
+      - 2181:2181
+      - 8080:8080
+
 volumes:
   hadoop_namenode:
   hadoop_datanode1:
@@ -171,7 +186,8 @@ networks:
 
 # URL Paths for Hadoop Services
 # Namenode: http://<dockerhadoop_IP_address>:9870/dfshealth.html#tab-overview
-# History server: http://<dockerhadoop_IP_address>:8188/applicationhistory
+# History Server: http://<dockerhadoop_IP_address>:8188/applicationhistory
 # Datanode: http://<dockerhadoop_IP_address>:9864/
 # Nodemanager: http://<dockerhadoop_IP_address>:8042/node
-# Resource manager: http://<dockerhadoop_IP_address>:8088/
+# Resource Manager: http://<dockerhadoop_IP_address>:8088/
+# Zookeeper Admin: http://<dockerhadoop_IP_address>:8080/commands
