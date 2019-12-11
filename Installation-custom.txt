@@ -159,3 +159,4 @@ Docker-Hadoop
 >> History server: http://10.0.1.54:8188/applicationhistory
 >> Nodemanager: http://10.0.1.54:8042/node
 >> Datanode: http://10.0.1.54:9864/
+>> Zookeeper: http://10.0.1.54:8080/commands
