@@ -4,12 +4,14 @@ CMD_START_DS=start-ds; CMD_STOP_DS=stop-ds
 CMD_START_MA=start-ma; CMD_STOP_MA=stop-ma
 CMD_START_MS=start-ms; CMD_STOP_MS=stop-ms
 CMD_START_ES=start-es; CMD_STOP_ES=stop-es
+CMD_START_EB=start-eb; CMD_STOP_EB=stop-eb
 CMD_START_DE=start-de; CMD_STOP_DE=stop-de
 
 D_MY1=mysql1; D_PG1=postgres1; D_MG1=mongo1; D_RD1=redis1; D_SL1=solr1
 D_CE1=container-exporter1; D_NE1=node-exporter1; D_CA1=cadvisor1
 D_AM1=alertmanager1; D_PR1=prometheus1; D_GR1=grafana1
-D_ES1=elastic1; D_KI1=kibana1; D_LS1=logstash1; D_FB1=filebeat1
+D_ES1=elastic1; D_KI1=kibana1; D_LS1=logstash1
+D_AB1=auditbeat1; D_FB1=filebeat1; D_HB1=heartbeat1; D_JB1=journalbeat1; D_MB1=metricbeat1; D_PB1=packetbeat1
 D_BC1=kie-workbench1; D_KS1=kie-server1
 
 L_ES1=elasticsearch; L_KI1=kibana; L_LS1=logstash
@@ -39,7 +41,7 @@ check_docker() {
 }
 
 if [[ $# -eq 0 ]] ; then
-    echo "$(date) $line $$: No argument supplied! use '$0 $CMD_START_DS/$CMD_STOP_DS/$CMD_START_MA/$CMD_STOP_MA/$CMD_START_MS/$CMD_STOP_MS/$CMD_START_ES/$CMD_STOP_ES/$CMD_START_DE/$CMD_STOP_DE'"
+    echo "$(date) $line $$: No argument supplied! use '$0 $CMD_START_DS/$CMD_STOP_DS/$CMD_START_MA/$CMD_STOP_MA/$CMD_START_MS/$CMD_STOP_MS/$CMD_START_ES/$CMD_STOP_ES/$CMD_START_EB/$CMD_STOP_EB/$CMD_START_DE/$CMD_STOP_DE'"
 else
     if [[ $# -eq 1 && $1 == $CMD_START_DS ]] ; then
         echo "$(date) $line $$: starting all datastore services"
@@ -107,12 +109,34 @@ else
         echo "$(date) $line $$: starting $D_LS1"
         $C_DOCKER --hostname=$D_LS1.local --name=$D_LS1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/logstash/conf",dst=/usr/share/logstash/config $C_MOUNT,src=$L_PATH"/logstash/pipeline",dst=/usr/share/logstash/pipeline --link $D_ES1:$L_ES1 -p 5044:5044 -p 9600:9600 docker.elastic.co/logstash/logstash:7.2.0
         sleep $SLEEP_INT
-        echo "$(date) $line $$: starting $D_FB1"
-        $C_DOCKER --hostname=$D_FB1.local --name=$D_FB1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/filebeat/conf/filebeat.yml",dst=/usr/share/filebeat/filebeat.yml $C_MOUNT,src=$L_PATH"/filebeat/vmlog",dst=/usr/share/filebeat/logs --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/filebeat:7.2.0
-        sleep $SLEEP_INT
     elif [[ $# -eq 1 && $1 == $CMD_STOP_ES ]] ; then
         echo "$(date) $line $$: stopping all elastic stack services"
-        docker stop $D_ES1 $D_KI1 $D_LS1 $D_FB1
+        docker stop $D_ES1 $D_KI1 $D_LS1
+        sleep $SLEEP_INT
+    elif [[ $# -eq 1 && $1 == $CMD_START_EB ]] ; then
+        echo "$(date) $line $$: starting all elastic beats services"
+        check_network
+        echo "$(date) $line $$: starting $D_AB1"
+        $C_DOCKER --hostname=$D_AB1.local --name=$D_AB1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/allbeats/conf/auditbeat.yml",dst=/usr/share/auditbeat/auditbeat.yml --cap-add="AUDIT_CONTROL" --cap-add="AUDIT_READ" --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/auditbeat:7.2.0
+        sleep $SLEEP_INT
+        echo "$(date) $line $$: starting $D_FB1"
+        $C_DOCKER --hostname=$D_FB1.local --name=$D_FB1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/allbeats/conf/filebeat.yml",dst=/usr/share/filebeat/filebeat.yml $C_MOUNT,src=$L_PATH"/filebeat/vmlog",dst=/usr/share/filebeat/logs --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/filebeat:7.2.0
+        sleep $SLEEP_INT
+        echo "$(date) $line $$: starting $D_HB1"
+        $C_DOCKER --hostname=$D_HB1.local --name=$D_HB1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/allbeats/conf/heartbeat.yml",dst=/usr/share/heartbeat/heartbeat.yml --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/heartbeat:7.2.0
+        sleep $SLEEP_INT
+        echo "$(date) $line $$: starting $D_JB1"
+        $C_DOCKER --hostname=$D_JB1.local --name=$D_JB1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/allbeats/conf/journalbeat.yml",dst=/usr/share/journalbeat/journalbeat.yml --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/journalbeat:7.2.0
+        sleep $SLEEP_INT
+        echo "$(date) $line $$: starting $D_MB1"
+        $C_DOCKER --hostname=$D_MB1.local --name=$D_MB1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/allbeats/conf/metricbeat.yml",dst=/usr/share/metricbeat/metricbeat.yml --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/metricbeat:7.2.0
+        sleep $SLEEP_INT
+        echo "$(date) $line $$: starting $D_PB1"
+        $C_DOCKER --hostname=$D_PB1.local --name=$D_PB1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/allbeats/conf/packetbeat.yml",dst=/usr/share/packetbeat/packetbeat.yml --cap-add=NET_ADMIN --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/packetbeat:7.2.0
+        sleep $SLEEP_INT
+    elif [[ $# -eq 1 && $1 == $CMD_STOP_EB ]] ; then
+        echo "$(date) $line $$: stopping all elastic beats services"
+        docker stop $D_AB1 $D_FB1 $D_HB1 $D_JB1 $D_MB1 $D_PB1
         sleep $SLEEP_INT
     elif [[ $# -eq 1 && $1 == $CMD_START_DE ]] ; then
         echo "$(date) $line $$: starting all drools engine services"
@@ -138,7 +162,7 @@ else
         docker stop $D_XX1
         sleep $SLEEP_INT
     else
-        echo "$(date) $line $$: You have gone to the wrong party! use '$0 $CMD_START_DS/$CMD_STOP_DS/$CMD_START_MA/$CMD_STOP_MA/$CMD_START_MS/$CMD_STOP_MS/$CMD_START_ES/$CMD_STOP_ES/$CMD_START_DE/$CMD_STOP_DE'"
+        echo "$(date) $line $$: You have gone to the wrong party! use '$0 $CMD_START_DS/$CMD_STOP_DS/$CMD_START_MA/$CMD_STOP_MA/$CMD_START_MS/$CMD_STOP_MS/$CMD_START_ES/$CMD_STOP_ES/$CMD_START_EB/$CMD_STOP_EB/$CMD_START_DE/$CMD_STOP_DE'"
     fi
 fi
 # show the docker containers and systems
