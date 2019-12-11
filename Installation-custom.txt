@@ -39,12 +39,12 @@ Docker-Logstash
 >> http://10.0.1.53:9600/_node/logging?pretty
 
 Docker-Beats
->> [https://www.elastic.co/guide/en/beats/auditbeat/7.2/running-on-docker.html]
->> [https://www.elastic.co/guide/en/beats/filebeat/7.2/running-on-docker.html
->> [https://www.elastic.co/guide/en/beats/heartbeat/7.2/running-on-docker.html]
->> [https://www.elastic.co/guide/en/beats/journalbeat/7.2/running-on-docker.html]
->> [https://www.elastic.co/guide/en/beats/metricbeat/7.2/running-on-docker.html]
->> [https://www.elastic.co/guide/en/beats/packetbeat/7.2/running-on-docker.html]
+>> [https://www.elastic.co/guide/en/beats/auditbeat/7.2/running-on-docker.html] -> curl -L -O https://raw.githubusercontent.com/elastic/beats/7.2/deploy/docker/auditbeat.docker.yml
+>> [https://www.elastic.co/guide/en/beats/filebeat/7.2/running-on-docker.html -> curl -L -O https://raw.githubusercontent.com/elastic/beats/7.2/deploy/docker/filebeat.docker.yml
+>> [https://www.elastic.co/guide/en/beats/heartbeat/7.2/running-on-docker.html] -> curl -L -O https://raw.githubusercontent.com/elastic/beats/7.2/deploy/docker/heartbeat.docker.yml
+>> [https://www.elastic.co/guide/en/beats/journalbeat/7.2/running-on-docker.html] -> curl -L -O https://raw.githubusercontent.com/elastic/beats/7.2/deploy/docker/journalbeat.docker.yml
+>> [https://www.elastic.co/guide/en/beats/metricbeat/7.2/running-on-docker.html] -> curl -L -O https://raw.githubusercontent.com/elastic/beats/7.2/deploy/docker/metricbeat.docker.yml
+>> [https://www.elastic.co/guide/en/beats/packetbeat/7.2/running-on-docker.html] -> curl -L -O https://raw.githubusercontent.com/elastic/beats/7.2/deploy/docker/packetbeat.docker.yml
 >>
 >> [Auditbeat]   docker pull docker.elastic.co/beats/auditbeat:7.2.0
 >> [Filebeat]    docker pull docker.elastic.co/beats/filebeat:7.2.0
