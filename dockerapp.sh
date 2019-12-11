@@ -120,7 +120,7 @@ else
         $C_DOCKER --hostname=$D_AB1.local --name=$D_AB1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/allbeats/conf/auditbeat.yml",dst=/usr/share/auditbeat/auditbeat.yml --cap-add="AUDIT_CONTROL" --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/auditbeat:7.2.0
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_FB1"
-        $C_DOCKER --hostname=$D_FB1.local --name=$D_FB1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/allbeats/conf/filebeat.yml",dst=/usr/share/filebeat/filebeat.yml $C_MOUNT,src=$L_PATH"/filebeat/vmlog",dst=/usr/share/filebeat/logs --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/filebeat:7.2.0
+        $C_DOCKER --hostname=$D_FB1.local --name=$D_FB1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/allbeats/conf/filebeat.yml",dst=/usr/share/filebeat/filebeat.yml $C_MOUNT,src=$L_PATH"/allbeats/vmlog",dst=/usr/share/filebeat/logs --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/filebeat:7.2.0
         sleep $SLEEP_INT
         echo "$(date) $line $$: starting $D_HB1"
         $C_DOCKER --hostname=$D_HB1.local --name=$D_HB1 --network=$D_NETWORK $C_MOUNT,src=$L_PATH"/allbeats/conf/heartbeat.yml",dst=/usr/share/heartbeat/heartbeat.yml --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/heartbeat:7.2.0
