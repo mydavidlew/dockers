@@ -38,3 +38,18 @@ Docker-superset
 >> docker exec -it superset1 superset load_examples
 >> # Create default roles and permissions
 >> docker exec -it superset1 superset init
+
+Docker-bigdata-apahce-nifi
+>> docker pull apache/nifi:latest
+>> docker run --rm --entrypoint /bin/bash apache/nifi -c 'env | grep NIFI'
+>>        NIFI_PID_DIR=/opt/nifi/nifi-current/run
+>>        NIFI_LOG_DIR=/opt/nifi/nifi-current/logs
+>>        NIFI_TOOLKIT_HOME=/opt/nifi/nifi-toolkit-current
+>>        NIFI_HOME=/opt/nifi/nifi-current
+>>        NIFI_BASE_DIR=/opt/nifi
+>> docker run -it --name nifi -p 8080:8080 apache/nifi
+>> docker run --rm --name nifi -p 8080:8080 -d apache/nifi
+>> docker exec -it nifi nifi-toolkit-current/bin/cli.sh nifi current-user
+>>
+>> NiFi instance UI to the host system on at port 8080, viewable at:
+>> http://localhost:8080/nifi
