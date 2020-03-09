@@ -49,7 +49,7 @@ Docker-bigdata-apahce-nifi
 >>        NIFI_BASE_DIR=/opt/nifi
 >> docker run -it --name nifi -p 8080:8080 apache/nifi
 >> docker run --rm --name nifi -p 8080:8080 -d apache/nifi
->> docker exec -it nifi nifi-toolkit-current/bin/cli.sh nifi current-user
+>> docker exec -it nifi /opt/nifi/nifi-toolkit-current/bin/cli.sh nifi current-user
 >>
 >> NiFi instance UI to the host system on at port 8080, viewable at:
 >> http://localhost:8080/nifi
