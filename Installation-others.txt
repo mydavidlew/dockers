@@ -55,8 +55,10 @@ Docker-bigdata-apahce-nifi
 >> http://localhost:8080/nifi
 
 >> Docker-joget-workflow https://www.joget.org/community/
+>> [https://hub.docker.com/r/jogetworkflow/joget-community]
 >> docker pull jogetworkflow/joget-community:latest
->> docker run -d -p 8080:8080 -v /var/lib/mysql --name joget jogetworkflow/joget-community
+>> docker run -it --rm --name joget -p 8080:8080 -v /var/lib/mysql jogetworkflow/joget-community
+>> docker run --rm --name joget -p 8080:8080 -v /var/lib/mysql -d jogetworkflow/joget-community
 >> docker volume create jogetdata
 >> docker run -d --name jogetdb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=jwdb -e MYSQL_USER=joget -e MYSQL_PASSWORD=joget -e MYSQL_DATABASE=jwdb mysql:5.7
 >> docker run -d --link jogetdb:jwdb --name joget -p 8080:8080 -e MYSQL_HOST=jwdb -e MYSQL_DATABASE=jwdb -e MYSQL_PORT=3306 -e MYSQL_USER=joget -e MYSQL_PASSWORD=joget --mount source=jogetdata,target=/opt/joget/wflow jogetworkflow/joget-community
