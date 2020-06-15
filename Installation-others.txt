@@ -7,7 +7,7 @@ Docker-metabase
 >> docker run --rm --name=metabase1 --link postgres1 --link mysql1 -p 3000:3000 -d metabase/metabase
 >> docker run --rm --name=metabase1 --network=appnet --env 'MB_DB_TYPE=postgres' --env 'MB_DB_DBNAME=metabase' --env 'MB_DB_PORT=5432' --env 'MB_DB_USER=postgres' --env 'MB_DB_PASS=password' --env 'MB_DB_HOST=postgres1' -p 3000:3000 -d metabase/metabase
 >> docker run --rm --name=metabase1 --network=appnet --env 'MB_DB_TYPE=mysql' --env 'MB_DB_DBNAME=metabase' --env 'MB_DB_PORT=3306' --env 'MB_DB_USER=root' --env 'MB_DB_PASS=password' --env 'MB_DB_HOST=mysql1' -p 3000:3000 -d metabase/metabase
->> docker logs metabase1
+>> docker logs -f metabase1
 >> docker exec -it metabase1 bash
 >> docker stop metabase1
 
@@ -17,7 +17,7 @@ Docker-keenio
 >> docker run -it --rm -p 80:80 keen/dashboards
 >> docker run --rm --name=keenio1 --link postgres1 --link mysql1 -p 80:80 -d keen/dashboards
 >> docker run --rm --name=keenio1 --network=appnet -p 80:80 -d keen/dashboards
->> docker logs keenio1
+>> docker logs -f keenio1
 >> docker exec -it keenio1 bash
 >> docker stop keenio1
 
@@ -28,7 +28,7 @@ Docker-superset
 >> docker network connect appnet postgres1
 >> docker network connect appnet redis1
 >> docker-compose up -d
->> docker logs superset1
+>> docker logs -f superset1
 >> docker exec -it superset1 bash
 >> docker stop superset1
 >>
@@ -59,6 +59,17 @@ Docker-bigdata-apahce-nifi
 >> docker pull jogetworkflow/joget-community:latest
 >> docker run -it --rm --name joget -p 8080:8080 -v /var/lib/mysql jogetworkflow/joget-community
 >> docker run --rm --name joget -p 8080:8080 -v /var/lib/mysql -d jogetworkflow/joget-community
+>>
+>> #create a volume container for shared data
 >> docker volume create jogetdata
+>> #run a MySQL database container
 >> docker run -d --name jogetdb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=jwdb -e MYSQL_USER=joget -e MYSQL_PASSWORD=joget -e MYSQL_DATABASE=jwdb mysql:5.7
+>> #run a Joget container
 >> docker run -d --link jogetdb:jwdb --name joget -p 8080:8080 -e MYSQL_HOST=jwdb -e MYSQL_DATABASE=jwdb -e MYSQL_PORT=3306 -e MYSQL_USER=joget -e MYSQL_PASSWORD=joget --mount source=jogetdata,target=/opt/joget/wflow jogetworkflow/joget-community
+>>
+>> docker logs -f joget
+>> docker exec -it joget bash
+>> docker stop joget
+>>
+>> Joget Workflow instance UI to the host system on at port 8080, viewable at:
+>> http://localhost:8080/jw/home/ --> (admin/admin)
