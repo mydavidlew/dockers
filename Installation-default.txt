@@ -12,7 +12,7 @@ Docker-mysql
 >> docker pull mysql:latest
 >> docker run --rm --name=mysql1 --env "MYSQL_ROOT_PASSWORD=password" -p 3306:3306 -d mysql
 >> docker run --rm --name=mysql1 --network=appnet --env "MYSQL_ROOT_PASSWORD=password" --mount type=bind,src=/opt/docker/mysql/data,dst=/var/lib/mysql -p 3306:3306 -d mysql
->> docker logs mysql1
+>> docker logs -f mysql1
 >> docker exec -it mysql1 bash
 >> docker exec -it mysql1 mysql -uroot -ppassword
 >> ALTER USER 'root'@'localhost' IDENTIFIED BY 'password';
@@ -29,7 +29,7 @@ Docker-postgresql
 >> docker pull postgres:latest
 >> docker run --rm --name=postgres1 --env "POSTGRES_PASSWORD=password" -p 5432:5432 -d postgres
 >> docker run --rm --name=postgres1 --network=appnet --env "POSTGRES_PASSWORD=password" --mount type=bind,src=/opt/docker/postgres/data,dst=/var/lib/postgresql/data -p 5432:5432 -d postgres
->> docker logs postgres1
+>> docker logs -f postgres1
 >> docker exec -it postgres1 bash
 >> docker exec -it postgres1 psql -Upostgres -W -p5432
 >> docker stop postgres1
@@ -42,7 +42,7 @@ Docker-mongodb
 >> docker pull mongo:latest
 >> docker run --rm --name=mongo1 -p 27017:27017 -d mongo
 >> docker run --rm --name=mongo1 --network=appnet --env "MONGO_INITDB_ROOT_USERNAME=root" --env "MONGO_INITDB_ROOT_PASSWORD=password" --mount type=bind,src=/opt/docker/mongo/data,dst=/data/db -p 27017:27017 -d mongo
->> docker logs mongo1
+>> docker logs -f mongo1
 >> docker exec -it mongo1 bash
 >> docker stop mongo1
 
@@ -52,7 +52,7 @@ Docker-redis
 >> docker run -it --rm -p 6379:6379 redis
 >> docker run --rm --name=redis1 -p 6379:6379 -d redis
 >> docker run --rm --name=redis1 --network=appnet --mount type=bind,src=/opt/docker/redis/data,dst=/data -p 6379:6379 -d redis
->> docker logs redis1
+>> docker logs -f redis1
 >> docker exec -it redis1 bash
 >> docker stop redis1
 
@@ -64,7 +64,7 @@ Docker-solr
 >> docker run --rm --name=solr1 -p 8983:8983 -d solr
 >> docker run --rm --name=solr1 --network=appnet --mount type=bind,src=/opt/docker/solr/data,dst=/var/solr/data -p 8983:8983 -d solr solr-precreate mycore
 >> docker run --rm --name=solr1 --network=appnet --mount type=bind,src=/opt/docker/solr/data,dst=/var/solr/data -p 8983:8983 -d solr
->> docker logs solr1
+>> docker logs -f solr1
 >> docker exec -it solr1 bash
 >> docker exec -it solr1 solr create_core -c mycore
 >> docker stop solr1
@@ -91,7 +91,7 @@ Docker-tomcat
 >> docker run --rm --name=tomcat2 -p 8081:8080 -d tomcat
 >> docker run --rm --name=tomcat3 -p 8082:8080 -d tomcat
 >> docker run --rm --name=tomcat1 --network=appnet --mount type=bind,src=/opt/docker/tomcat/conf,dst=/usr/local/tomcat/conf --mount type=bind,src=/opt/docker/tomcat/webapps,dst=/usr/local/tomcat/webapps -p 8080:8080 -d tomcat
->> docker logs tomcat1
+>> docker logs -f tomcat1
 >> docker exec -it tomcat1 bash
 >> docker stop tomcat1
 
@@ -103,7 +103,7 @@ Docker-nginx
 >> docker run --rm --name=nginx2 -p 81:80 -d nginx
 >> docker run --rm --name=nginx3 -p 82:80 -d nginx
 >> docker run --rm --name=nginx1 --network=appnet --mount type=bind,src=/opt/docker/nginx/conf/nginx.conf,dst=/etc/nginx/nginx.conf --mount type=bind,src=/opt/docker/nginx/conf/conf.d,dst=/etc/nginx/conf.d --mount type=bind,src=/opt/docker/nginx/html,dst=/usr/share/nginx/html -p 80:80 -d nginx
->> docker logs nginx1
+>> docker logs -f nginx1
 >> docker exec -it nginx1 bash
 >> docker stop nginx1
 
@@ -113,7 +113,7 @@ Docker-grafana
 >> docker run --rm --name=grafana1 -p 3000:3000 -d grafana/grafana
 >> docker run --rm --name=grafana1 --link postgres1 --link mysql1 --mount type=bind,src=/opt/docker/grafana/conf/grafana.ini,dst=/etc/grafana/grafana.ini --mount type=bind,src=/opt/docker/grafana/data,dst=/var/lib/grafana -p 3000:3000 -d grafana/grafana
 >> docker run --rm --name=grafana1 --network=appnet --mount type=bind,src=/opt/docker/grafana/conf/grafana.ini,dst=/etc/grafana/grafana.ini --mount type=bind,src=/opt/docker/grafana/data,dst=/var/lib/grafana -p 3000:3000 -d grafana/grafana
->> docker logs grafana1
+>> docker logs -f grafana1
 >> docker exec -it grafana1 bash
 >> docker stop grafana1
 
