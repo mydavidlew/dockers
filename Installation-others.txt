@@ -59,6 +59,7 @@ Docker-bigdata-apahce-nifi
 >> docker pull jogetworkflow/joget-community:latest
 >> docker run -it --rm --name joget -p 8080:8080 -v /var/lib/mysql jogetworkflow/joget-community
 >> docker run --rm --name joget --network=appnet -p 8080:8080 -v /var/lib/mysql -d jogetworkflow/joget-community
+>> docker run --rm --name joget --network=appnet --link 10.0.1.51:mysql --env MYSQL_HOST=mysql --env MYSQL_DATABASE=jwdb --env MYSQL_PORT=3306 --env MYSQL_USER=root --env MYSQL_PASSWORD=password --mount type=bind,src=/opt/docker/joget/wflow,dst=/opt/joget/wflow  -p 8080:8080 -d jogetworkflow/joget-community
 >> #create a volume container for shared data
 >> docker volume create jogetdata
 >> #run a MySQL database container
