@@ -60,12 +60,12 @@ Docker-bigdata-apahce-nifi
 >> docker run -it --rm --name joget -p 8080:8080 -v /var/lib/mysql jogetworkflow/joget-community
 >> docker run --rm --name joget --network=appnet -p 8080:8080 -v /var/lib/mysql -d jogetworkflow/joget-community
 >> docker run --rm --name joget --network=appnet --link 10.0.1.51:mysql --env MYSQL_HOST=mysql --env MYSQL_DATABASE=jwdb --env MYSQL_PORT=3306 --env MYSQL_USER=root --env MYSQL_PASSWORD=password --mount type=bind,src=/opt/docker/joget/wflow,dst=/opt/joget/wflow  -p 8080:8080 -d jogetworkflow/joget-community
->> #create a volume container for shared data
->> docker volume create jogetdata
->> #run a MySQL database container
->> docker run --name mysql --network=appnet -e MYSQL_ROOT_PASSWORD=jwdb -e MYSQL_USER=joget -e MYSQL_PASSWORD=joget -e MYSQL_DATABASE=jwdb -p 3306:3306 -d mysql:5.7
->> #run a Joget container
->> docker run --name joget --network=appnet --link mysql:jwdb -e MYSQL_HOST=jwdb -e MYSQL_DATABASE=jwdb -e MYSQL_PORT=3306 -e MYSQL_USER=joget -e MYSQL_PASSWORD=joget --mount source=jogetdata,target=/opt/joget/wflow -p 8080:8080 -d jogetworkflow/joget-community
+>>@ #create a volume container for shared data
+>>@ docker volume create jogetdata
+>>@ #run a MySQL database container
+>>@ docker run --name mysql --network=appnet -e MYSQL_ROOT_PASSWORD=jwdb -e MYSQL_USER=joget -e MYSQL_PASSWORD=joget -e MYSQL_DATABASE=jwdb -p 3306:3306 -d mysql:5.7
+>>@ #run a Joget container
+>>@ docker run --name joget --network=appnet --link mysql:jwdb -e MYSQL_HOST=jwdb -e MYSQL_DATABASE=jwdb -e MYSQL_PORT=3306 -e MYSQL_USER=joget -e MYSQL_PASSWORD=joget --mount source=jogetdata,target=/opt/joget/wflow -p 8080:8080 -d jogetworkflow/joget-community
 >> docker logs -f joget
 >> docker exec -it joget bash
 >> docker stop joget
