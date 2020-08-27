@@ -20,6 +20,7 @@ Docker-mysql
 >> ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
 >> docker stop mysql1
 >>
+>> USE mysql; UPDATE user SET authentication_string=password('password') where user='root';
 >> CREATE USER 'test'@'%' IDENTIFIED BY 'password';
 >> GRANT ALL PRIVILEGES ON *.* TO 'test'@'%' WITH GRANT OPTION;
 >> docker exec -it myapp1 mysql --host=mysql1 --user=test --password
@@ -34,6 +35,8 @@ Docker-postgresql
 >> docker exec -it postgres1 psql -Upostgres -W -p5432
 >> docker stop postgres1
 >>
+>> #sudo -u postgres psql -h localhost postgres
+>> ALTER USER postgres PASSWORD 'password';
 >> CREATE USER test WITH ENCRYPTED PASSWORD 'password';
 >> GRANT ALL PRIVILEGES ON DATABASE postgres TO test WITH GRANT OPTION;
 
