@@ -54,7 +54,7 @@ Docker-bigdata-apahce-nifi
 >> NiFi instance UI to the host system on at port 8080, viewable at:
 >> http://localhost:8080/nifi
 
->> Docker-joget-workflow - https://www.joget.org/community/
+Docker-joget-workflow - https://www.joget.org/community/
 >> [https://hub.docker.com/r/jogetworkflow/joget-community]
 >> docker pull jogetworkflow/joget-community:latest
 >> docker run -it --rm --name joget -p 8080:8080 -v /var/lib/mysql jogetworkflow/joget-community
@@ -72,3 +72,17 @@ Docker-bigdata-apahce-nifi
 >>
 >> Joget Workflow instance UI to the host system on at port 8080, viewable at:
 >> http://localhost:8080/jw/home/ --> (admin/admin)
+
+Docker-Alfresco - https://github.com/Alfresco/acs-deployment/tree/master/docs/docker-compose
+>> [https://hub.docker.com/u/alfresco]
+>> Alfresco Content Repository - https://hub.docker.com/r/alfresco/alfresco-content-repository-community
+>> Alfresco Share - https://hub.docker.com/r/alfresco/alfresco-share
+>> Alfresco Solr6 - https://hub.docker.com/r/alfresco/alfresco-search-services
+>> Alfresco ActiveMQ - https://hub.docker.com/r/alfresco/alfresco-activemq
+>>
+>> docker-compose -f alfresco/docker-compose.yml up -d <alfresco/share/solr6/activemq>
+>> docker-compose -f alfresco/docker-compose.yml logs -f <alfresco/share/solr6/activemq>
+>> docker-compose -f alfresco/docker-compose.yml exec <alfresco/share/solr6/activemq> bash
+>> docker-compose -f alfresco/docker-compose.yml stop <alfresco/share/solr6/activemq>
+>> docker-compose -f alfresco/docker-compose.yml down --rmi local
+>>
