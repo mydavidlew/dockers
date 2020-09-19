@@ -13,26 +13,25 @@ version: "2"
 services:
     alfresco:
         image: alfresco/alfresco-content-repository-community:6.2.2-A1
-        mem_limit: 1700m
         hostname: alfresco
         container_name: alfresco
-        restart: "no"
-        networks:
-            - networks1
+        restart: unless-stopped
+        mem_limit: 1700m
         environment:
+            SERVICE_PRECONDITION: "activemq:8161 solr6:8983"
             JAVA_OPTS: "
                 -Ddb.driver=org.postgresql.Driver
                 -Ddb.username=postgres
                 -Ddb.password=password
-                -Ddb.url=jdbc:postgresql://10.0.1.51:5432/alfresco
+                -Ddb.url=jdbc:postgresql://postgresql:5432/alfresco
                 -Dsolr.host=solr6
                 -Dsolr.port=8983
                 -Dsolr.secureComms=none
                 -Dsolr.base.url=/solr
                 -Dindex.subsystem.name=solr6
-                -Dshare.host=10.0.1.55
+                -Dshare.host=127.0.0.1
                 -Dshare.port=8081
-                -Dalfresco.host=10.0.1.55
+                -Dalfresco.host=localhost
                 -Dalfresco.port=8080
                 -Daos.baseUrlOverwrite=http://localhost:8080/alfresco/aos
                 -Dmessaging.broker.url=\"failover:(nio://activemq:61616)?timeout=3000&jms.useCompression=true\"
@@ -40,8 +39,12 @@ services:
                 -Dcsrf.filter.enabled=false
                 -Xms1500m -Xmx1500m
                 "
+        networks:
+            - networks1
         ports:
             - 8080:8080
+        external_links:
+            - postgres1:postgresql
 
 #    transform-router:
 #        mem_limit: 512m
@@ -84,13 +87,12 @@ services:
 
     share:
         image: alfresco/alfresco-share:6.2.2
-        mem_limit: 1g
         hostname: share
         container_name: share
-        restart: "no"
-        networks:
-            - networks1
+        restart: unless-stopped
+        mem_limit: 1g
         environment:
+            SERVICE_PRECONDITION: "activemq:8161 solr6:8983 alfresco:8080"
             REPO_HOST: "alfresco"
             REPO_PORT: "8080"
             JAVA_OPTS: "
@@ -101,6 +103,8 @@ services:
                 -Dalfresco.context=alfresco
                 -Dalfresco.protocol=http
                 "
+        networks:
+            - networks1
         ports:
             - 8081:8080
 
@@ -117,12 +121,10 @@ services:
 
     solr6:
         image: alfresco/alfresco-search-services:2.0.0
-        mem_limit: 2g
         hostname: solr6
         container_name: solr6
-        restart: "no"
-        networks:
-            - networks1
+        restart: unless-stopped
+        mem_limit: 2g
         environment:
             #Solr needs to know how to register itself with Alfresco
             - SOLR_ALFRESCO_HOST=alfresco
@@ -135,15 +137,17 @@ services:
             #HTTP by default
             - ALFRESCO_SECURE_COMMS=none
             - "SOLR_JAVA_MEM=-Xms2g -Xmx2g"
+        networks:
+            - networks1
         ports:
             - 8083:8983 #Browser port
 
     activemq:
         image: alfresco/alfresco-activemq:5.15.8
-        mem_limit: 1g
         hostname: activemq
         container_name: activemq
-        restart: "no"
+        restart: unless-stopped
+        mem_limit: 1g
         networks:
             - networks1
         ports:
@@ -158,7 +162,7 @@ services:
 #        environment:
 #            BASE_PATH: ./
 #
-#    proxy:
+#    proxy:--network=appnet
 #        image: alfresco/alfresco-acs-nginx:3.0.1
 #        mem_limit: 128m
 #        depends_on:
@@ -190,13 +194,14 @@ services:
 #        ports:
 #            - 9090:9090
 
-networks:
-    networks1:
-        external:
-            name: appnet
-
 volumes:
     shared-file-store-volume:
         driver_opts:
             type: tmpfs
             device: tmpfs
+
+networks:
+    networks1:
+        external:
+            name: appnet
+
