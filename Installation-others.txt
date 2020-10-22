@@ -1,6 +1,24 @@
 Docker-shellrunservers
 >> docker network create appnet
 
+Docker-superset
+>> git clone https://github.com/apache/incubator-superset/ superset
+>> <cd superset/contrib/docker>docker build -t superset .
+>> docker-compose run --rm --name superset1 superset ./docker-init.sh
+>> docker network connect appnet postgres1
+>> docker network connect appnet redis1
+>> docker-compose up -d
+>> docker logs -f superset1
+>> docker exec -it superset1 bash
+>> docker stop superset1
+>>
+>> # Initialize the database
+>> docker exec -it superset1 superset db upgrade
+>> # Load some data to play with
+>> docker exec -it superset1 superset load_examples
+>> # Create default roles and permissions
+>> docker exec -it superset1 superset init
+
 Docker-metabase
 >> docker pull metabase/metabase:latest
 >> docker run -it --rm -p 3000:3000 metabase/metabase
@@ -21,24 +39,6 @@ Docker-keenio
 >> docker exec -it keenio1 bash
 >> docker stop keenio1
 
-Docker-superset
->> git clone https://github.com/apache/incubator-superset/ superset
->> <cd superset/contrib/docker>docker build -t superset .
->> docker-compose run --rm --name superset1 superset ./docker-init.sh
->> docker network connect appnet postgres1
->> docker network connect appnet redis1
->> docker-compose up -d
->> docker logs -f superset1
->> docker exec -it superset1 bash
->> docker stop superset1
->>
->> # Initialize the database
->> docker exec -it superset1 superset db upgrade
->> # Load some data to play with
->> docker exec -it superset1 superset load_examples
->> # Create default roles and permissions
->> docker exec -it superset1 superset init
-
 Docker-bigdata-apahce-nifi
 >> docker pull apache/nifi:latest
 >> docker run --rm --entrypoint /bin/bash apache/nifi -c 'env | grep NIFI'
@@ -53,45 +53,3 @@ Docker-bigdata-apahce-nifi
 >>
 >> NiFi instance UI to the host system on at port 8080, viewable at:
 >> http://localhost:8080/nifi
-
-Docker-joget-workflow - https://www.joget.org/community/
->> [https://hub.docker.com/r/jogetworkflow/joget-community]
->> docker pull jogetworkflow/joget-community:latest
->> docker run -it --rm --name joget -p 8080:8080 -v /var/lib/mysql jogetworkflow/joget-community
->> docker run --rm --name joget --network=appnet -p 8080:8080 -v /var/lib/mysql -d jogetworkflow/joget-community
->> docker run --rm --name joget --network=appnet --env MYSQL_HOST=10.0.1.51 --env MYSQL_DATABASE=jwdb --env MYSQL_PORT=3306 --env MYSQL_USER=root --env MYSQL_PASSWORD=password --mount type=bind,src=/opt/docker/joget/wflow,dst=/opt/joget/wflow  -p 8080:8080 -d jogetworkflow/joget-community
->>@ #create a volume container for shared data
->>@ docker volume create jogetdata
->>@ #run a MySQL database container
->>@ docker run --name mysql --network=appnet -e MYSQL_ROOT_PASSWORD=jwdb -e MYSQL_USER=joget -e MYSQL_PASSWORD=joget -e MYSQL_DATABASE=jwdb -p 3306:3306 -d mysql:5.7
->>@ #run a Joget container
->>@ docker run --name joget --network=appnet --link mysql:jwdb -e MYSQL_HOST=jwdb -e MYSQL_DATABASE=jwdb -e MYSQL_PORT=3306 -e MYSQL_USER=joget -e MYSQL_PASSWORD=joget --mount source=jogetdata,target=/opt/joget/wflow -p 8080:8080 -d jogetworkflow/joget-community
->> docker logs -f joget
->> docker exec -it joget bash
->> docker stop joget
->>
->> Joget Workflow instance UI to the host system on at port 8080, viewable at:
->> http://localhost:8080/jw/home/ --> (admin/admin)
-
-Docker-Alfresco - https://github.com/Alfresco/acs-deployment/tree/master/docs/docker-compose
->> [https://hub.docker.com/u/alfresco]
->> Alfresco Content Repository - https://hub.docker.com/r/alfresco/alfresco-content-repository-community
->> Alfresco Share - https://hub.docker.com/r/alfresco/alfresco-share
->> Alfresco Solr6 - https://hub.docker.com/r/alfresco/alfresco-search-services
->> Alfresco ActiveMQ - https://hub.docker.com/r/alfresco/alfresco-activemq
->>
->> docker-compose -f alfresco/docker-compose.yml up -d <alfresco/share/solr6/activemq>
->> docker-compose -f alfresco/docker-compose.yml logs -f <alfresco/share/solr6/activemq>
->> docker-compose -f alfresco/docker-compose.yml exec <alfresco/share/solr6/activemq> bash
->> docker-compose -f alfresco/docker-compose.yml stop <alfresco/share/solr6/activemq>
->> docker-compose -f alfresco/docker-compose.yml down --rmi local
->>
->> Open the following URLs in your browser to check that everything starts up:
->> Administration and REST APIs: http://<machine_ip>:8080/alfresco
->> Alfresco Digital Workspace: http://<machine_ip>:8080/workspace
->> Share: http://<machine_ip>:8080/share
->> Search administration: http://<machine_ip>:8083/solr
->>
->> If you requested an extended trial license navigate to the Admin Console and apply your license:
->> http://<machine_ip>:8080/alfresco/service/enterprise/admin/admin-license
->> Default username and password is admin
