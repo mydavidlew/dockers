@@ -3,14 +3,14 @@ Docker-shellrunservers
 
 Docker-superset
 >> # Option-1
->> git clone https://github.com/apache/incubator-superset/ superset
->> <cd superset/contrib/docker>docker build -t superset .
+>> git clone https://github.com/apache/incubator-superset/ superset/
+>> <cd superset/contrib/docker/>docker build -t superset .
 >> docker-compose run --rm --name superset1 superset ./docker-init.sh
 >> docker network connect appnet postgres1
 >> docker network connect appnet redis1
 >> # Option-2
 >> git clone https://github.com/apache/incubator-superset.git superset/
->> <cd superset/incubator-superset>docker-compose up
+>> <cd superset/>docker-compose up
 >>
 >> docker-compose up -d
 >> docker logs -f superset1
