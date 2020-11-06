@@ -1,6 +1,24 @@
 Docker-shellrunservers
 >> docker network create appnet
 
+Docker WHO ICD-11 - https://icd.who.int/icdapi/docs2/ICDAPI-Container-Readme/
+>> # WHO Docker Hub - https://hub.docker.com/r/whoicd/icd-api
+>> docker pull whoicd/icd-api
+>> docker run -p 80:80 -e acceptLicense=true -e saveAnalytics=true whoicd/icd-api
+>> @ -e acceptLicense=true : is a required parameter which means you agree with the license agreement
+>> @ -e saveAnalytics=true : If you set this option to true, the container that is deployed can send data to WHO on the searches made in order to improve search capability of ICD-11 tools. The data that is sent does not contain any ids or ip addresses.
+>> docker run -it --rm --name=whoicd --network=appnet -p 80:80 -e acceptLicense=true -e saveAnalytics=true whoicd/icd-api
+>> docker run --rm --name=whoicd --network=appnet -p 80:80 -e acceptLicense=true -e saveAnalytics=true -d whoicd/icd-api
+>>
+>> docker logs -f whoicd
+>> docker exec -it whoicd bash
+>> docker stop whoicd
+>>
+>> # Container swagger endpoint /swagger/index.html
+>> http://localhost/swagger/index.html
+>> # ICD-11 Coding Tool application
+>> http://localhost/ct11
+
 Docker-superset
 >> # Option-1
 >> git clone https://github.com/apache/incubator-superset/ superset/
