@@ -11,7 +11,7 @@ Docker WHO ICD-11 - https://icd.who.int/icdapi/docs2/ICDAPI-Container-Readme/
 >> docker run --rm --name=whoicd --network=appnet -p 80:80 -e acceptLicense=true -e saveAnalytics=true -d whoicd/icd-api
 >>
 >> docker logs -f whoicd
->> docker exec -it whoicd bash
+>> docker exec -it whoicd sh
 >> docker stop whoicd
 >>
 >> # Container swagger endpoint /swagger/index.html
