@@ -22,12 +22,12 @@ L_PATH="/opt/docker"
 C_COMMAND="null"
 
 check_command() {
-	if [[ $1 == $C_START || $1 == $C_STOP || $1 == $C_RUN || $1 == $C_REMOVE ]] ; then
-		echo "$(date) $line $$: valid docker $1 command found"
-		C_COMMAND=$1
-	else
-		echo "$(date) $line $$: error detected docker $1 command"
-	fi
+    if [[ $1 == $C_START || $1 == $C_STOP || $1 == $C_RUN || $1 == $C_REMOVE ]] ; then
+        echo "$(date) $line $$: valid docker $1 command found"
+        C_COMMAND=$1
+    else
+        echo "$(date) $line $$: error detected docker $1 command"
+    fi
 }
 
 check_network() { 
@@ -47,7 +47,7 @@ check_docker() {
     docker network ls
 }
 
-if [[ $# -ne 2 && ($1 != $C_START || $1 != $C_STOP || $1 != $C_RUN || $1 != $C_REMOVE) ]] ; then
+if [[ $# -ne 2 || ($1 != $C_START || $1 != $C_STOP || $1 != $C_RUN || $1 != $C_REMOVE) ]] ; then
     echo "$(date) $line $$: No argument supplied! use '$0 $C_START/$C_STOP/$C_RUN/$C_REMOVE $APP_DS/$APP_MA/$APP_MS/$APP_ES/$APP_EB/$APP_DE'"
 else
     if [[ $# -eq 2 && $1 == $C_RUN && $2 == $APP_DS ]] ; then
