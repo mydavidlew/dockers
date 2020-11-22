@@ -3,6 +3,7 @@ Docker-shellrunservers
 
 Docker-ElasticSearch
 >> [https://www.elastic.co/guide/en/elasticsearch/reference/7.2/docker.html]
+>> [ElasticSearch CheatSheet = https://github.com/jolicode/elasticsearch-cheatsheet]
 >> docker pull docker.elastic.co/elasticsearch/elasticsearch:7.2.0
 >> docker run -it --rm --name=elastic1 --network=appnet --env "discovery.type=single-node" -p 9200:9200 -p 9300:9300 docker.elastic.co/elasticsearch/elasticsearch:7.2.0
 >> docker run --rm --name=elastic1 --network=appnet --env "discovery.type=single-node" --env "cluster.name=elastic-cluster" --mount type=bind,src=/opt/docker/elasticsearch/conf,dst=/usr/share/elasticsearch/config --mount type=bind,src=/opt/docker/elasticsearch/data,dst=/usr/share/elasticsearch/data -p 9200:9200 -p 9300:9300 -d docker.elastic.co/elasticsearch/elasticsearch:7.2.0
@@ -12,7 +13,14 @@ Docker-ElasticSearch
 >>
 >> [Elasticsearch list of nodes is located at:]
 >> http://10.0.1.53:9200/_cat?pretty
+>> http://10.0.1.53:9200/_cat/indices?v&pretty
 >> http://10.0.1.53:9200/_nodes?pretty
+>> http://10.0.1.53:9200/_nodes/stats?pretty
+>> http://10.0.1.53:9200/_cluster/stats?pretty
+>> http://10.0.1.53:9200/_cluster/state?pretty
+>> http://10.0.1.53:9200/<index_name>/_search?pretty
+>> http://10.0.1.53:9200/<index_name>/_mapping?pretty
+>> http://10.0.1.53:9200/<index_name>/_settings?pretty
 
 Docker-Kibana
 >> [https://www.elastic.co/guide/en/kibana/7.2/docker.html]
