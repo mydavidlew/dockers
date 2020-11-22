@@ -46,7 +46,12 @@ Docker-Logstash
 >> docker stop logstash1
 >>
 >> [To retrieve a list of logging subsystems available at runtime:]
+>> http://10.0.1.53:9600/_node?pretty
 >> http://10.0.1.53:9600/_node/logging?pretty
+>> http://10.0.1.53:9600/_node/pipelines?pretty
+>> http://10.0.1.53:9600/_node/plugins?pretty
+>> http://10.0.1.53:9600/_node/stats?pretty
+>> http://10.0.1.53:9600/_node/hot_threads?pretty
 
 Docker-Beats
 >> [https://www.elastic.co/guide/en/beats/auditbeat/7.2/running-on-docker.html] -> curl -L -O https://raw.githubusercontent.com/elastic/beats/7.2/deploy/docker/auditbeat.docker.yml
