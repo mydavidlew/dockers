@@ -26,3 +26,6 @@ sudo systemctl status docker
 
 # Add your username to the docker group:
 sudo usermod -aG docker ${USER}
+
+# Refresh and reload the current terminal
+source ~/.bashrc
