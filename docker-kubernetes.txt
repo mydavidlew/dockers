@@ -19,6 +19,7 @@ $ curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key a
 $ echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
 $ sudo apt-get update
 $ sudo apt-get install -y kubectl kubeadm kubelet
+$ sudo apt-mark hold kubelet kubeadm kubectl   (*optional)
 
 ***CentOS, RHEL or Fedora***
 $ cat <<EOF > /etc/yum.repos.d/kubernetes.repo
@@ -31,6 +32,7 @@ repo_gpgcheck=1
 gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 EOF
 $ yum install -y kubectl kubeadm kubelet
+$ sudo systemctl enable --now kubelet   (*optional)
 
 [[[Optional kubectl configurations]]]
 C) Install bash-completion
@@ -53,3 +55,5 @@ $ kubectl completion bash >/etc/bash_completion.d/kubectl
 If you have an alias for kubectl, you can extend shell completion to work with that alias:
 $ echo 'alias k=kubectl' >>~/.bashrc
 $ echo 'complete -F __start_kubectl k' >>~/.bashrc
+
+[[[Configure cgroup driver used by kubelet on control-plane node]]]
