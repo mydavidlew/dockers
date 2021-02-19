@@ -14,13 +14,22 @@ $ echo "$(<kubectl.sha256) kubectl" | sha256sum --check
 Install kubectl
 $ sudo install -o root -g root -m 0755 kubectl /usr/bin/kubectl
 
-Get clusters information
+Get or describe clusters information
 $ kubectl api-resources
-$ kubectl describe pods
-$ kubectl describe services
-$ kubectl describe endpoints
-$ kubectl describe namespaces
-$ kubectl describe deployments
+$ kubectl get/describe pods
+$ kubectl get/describe services
+$ kubectl get/describe endpoints
+$ kubectl get/describe namespaces
+$ kubectl get/describe deployments
+
+To restart or reboot all deployment pods
+$ kubectl rollout restart deployment <deployment-name>
+$ kubectl scale deployment <deployment-name> --replicas=0
+
+Create and expose a new service deployment, next to allow forwarding firewall to public port
+$ kubectl expose deployment <deployment-name> --type=<ClusterIP/NodePort/LoadBalancer/ExternalName> --name=<new-servicename> --port=<ext-port>  --target-port=<int-port>
+$ kubectl port-forward svc/<new-servicename> <public-port>:<ext-port>
+$ curl http://localhost:<public-port>
 
 B) Install using native package management
 ***Ubuntu, Debian or HypriotOS***
@@ -164,12 +173,9 @@ Remove the admin "ServiceAccount" and "ClusterRoleBinding".
 $ kubectl -n kubernetes-dashboard delete serviceaccount admin-user
 $ kubectl -n kubernetes-dashboard delete clusterrolebinding admin-user
 
-$ kubectl rollout restart deployment <deployment-name>
-$ kubectl scale deployment <deployment-name> --replicas=0
-
 Notes:
 Port configurations for Kubernetes Services
 In Kubernetes there are several different port configurations for Kubernetes services:
-1) Port - exposes the Kubernetes service on the specified port within the cluster. Other pods within the cluster can communicate with this server on the specified port.
-2) TargetPort - is the port on which the service will send requests to, that your pod will be listening on. Your application in the container will need to be listening on this port also.
-3) NodePort - exposes a service externally to the cluster by means of the target nodes IP address and the NodePort. NodePort is the default setting if the port field is not specified.
+1) Port - (external port to map) exposes the Kubernetes service on the specified port within the cluster. Other pods within the cluster can communicate with this server on the specified port.
+2) TargetPort - (internal container port) is the port on which the service will send requests to, that your pod will be listening on. Your application in the container will need to be listening on this port also.
+3) NodePort - (public port combine with external IP) exposes a service externally to the cluster by means of the target nodes IP address and the NodePort. NodePort is the default setting if the port field is not specified.
