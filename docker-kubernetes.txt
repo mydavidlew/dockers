@@ -30,6 +30,7 @@ Create and expose a new service deployment, next to allow forwarding firewall to
 $ kubectl expose deployment <deployment-name> --type=<ClusterIP/NodePort/LoadBalancer/ExternalName> --name=<new-servicename> --port=<ext-port>  --target-port=<int-port>
 $ kubectl port-forward svc/<new-servicename> <public-port>:<ext-port>
 $ curl http://localhost:<public-port>
+$ kubectl delete services <new-servicename>
 
 B) Install using native package management
 ***Ubuntu, Debian or HypriotOS***
