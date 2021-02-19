@@ -14,6 +14,14 @@ $ echo "$(<kubectl.sha256) kubectl" | sha256sum --check
 Install kubectl
 $ sudo install -o root -g root -m 0755 kubectl /usr/bin/kubectl
 
+Get clusters information
+$ kubectl api-resources
+$ kubectl describe pods
+$ kubectl describe services
+$ kubectl describe endpoints
+$ kubectl describe namespaces
+$ kubectl describe deployments
+
 B) Install using native package management
 ***Ubuntu, Debian or HypriotOS***
 $ sudo apt-get update && sudo apt-get install -y apt-transport-https gnupg2 curl
