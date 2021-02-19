@@ -58,3 +58,23 @@ $ echo 'alias k=kubectl' >>~/.bashrc
 $ echo 'complete -F __start_kubectl k' >>~/.bashrc
 
 [[[Configure cgroup driver used by kubelet on control-plane node]]]
+Control groups are used to constrain resources that are allocated to processes. When 'systemd' is chosen as the init system for a Linux distribution, the init process generates and consumes a root control group (cgroup) and acts as a cgroup manager. Systemd has a tight integration with cgroups and allocates a cgroup per systemd unit. It's possible to configure your container runtime and the kubelet to use 'cgroupfs'. Using 'cgroupfs' alongside systemd means that there will be two different cgroup managers. A single cgroup manager simplifies the view of what resources are being allocated and will by default have a more consistent view of the available and in-use resources. When there are two cgroup managers on a system, you end up with two views of those resources. In the field, people have reported cases where nodes that are configured to use 'cgroupfs' for the kubelet and Docker, but 'systemd' for the rest of the processes, become unstable under resource pressure. Changing the settings such that your container runtime and kubelet use 'systemd' as the cgroup driver stabilized the system.
+
+Your cgroup driver used by Kubelet must match Docker’s cgroup driver.
+
+$ docker info | grep -i cgroup
+you will get a Docker cgroup driver. And with the command
+
+$ sudo cat /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+the Kubelet configuration. In the column with the flag “–cgroup-driver=” you can see the setting.
+--> Environment="KUBELET_CGROUP_ARGS=--cgroup-driver=systemd"
+
+When I installed Docker v.1.12 and kubeadm on CentOS 7, the Docker cgroup driver was specified with cgroupfs and for Kubelet with systemd. If you find the same setting, you can adjust the kubelet config with the following command:
+$ sed -i "s/cgroup-driver=systemd/cgroup-driver=cgroupfs/g" /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+or
+$ CG=$(sudo docker info 2>/dev/null | sed -n 's/Cgroup Driver: \(.*\)/\1/p')
+$ sed -i "s/cgroup-driver=systemd/cgroup-driver=$CG/g" /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+
+If an adjustment has been made, your Kubelet must be restarted.
+$ sudo systemctl daemon-reload
+$ sudo systemctl restart kubelet
