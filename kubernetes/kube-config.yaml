@@ -1,29 +1,40 @@
+# This config file contains all config fields with comments
+# NOTE: this is not a particularly useful config file
+#
+# (run) kubectl config --kubeconfig=kubernetes/kube-config.yaml set-cluster development
+# (run) kubectl config --kubeconfig=kubernetes/kube-config.yaml set-cluster production
+# (run) kubectl config --kubeconfig=kubernetes/kube-config.yaml set-cluster kind-kind
+#
 apiVersion: v1
-kind: Config
-preferences: {}
 clusters:
 - cluster:
-    insecure-skip-tls-verify: true
     server: https://127.0.0.1
   name: development
 - cluster:
-    insecure-skip-tls-verify: true
+    server: https://127.0.0.1
+  name: kind-kind
+- cluster:
     server: https://127.0.0.1
   name: production
 contexts:
 - context:
     cluster: development
-    namespace: development
-    user: developer
+    namespace: default
+    user: kind-kind
   name: dev-context
 - context:
     cluster: production
-    namespace: production
-    user: developer
+    namespace: default
+    user: kind-kind
   name: prod-context
-current-context: dev-context
+- context:
+    cluster: kind-kind
+    namespace: default
+    user: kind-kind
+  name: kind-kind
+current-context: kind-kind
+kind: Config
+preferences: {}
 users:
-- name: developer
-  user:
-    password: admin
-    username: admin
+- name: kind-kind
+  user: {}
