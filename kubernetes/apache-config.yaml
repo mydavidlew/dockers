@@ -5,6 +5,8 @@
 # (run) kubectl rollout status deployment/mywebserver
 # (run) kubectl edit deployment.v1.apps/mywebserver
 # (run) kubectl rollout history deployment.v1.apps/mywebserver
+# (run) kubectl expose deployment mywebserver --type=ClusterIP --name=mywebserver --port=8081  --target-port=80
+# (run) kubectl port-forward svc/mywebserver 8081:8081
 #
 apiVersion: apps/v1
 kind: Deployment
