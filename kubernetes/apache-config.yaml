@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mywhoicd11
+  name: mywebserver
   namespace: default
   labels:
-    k8s-app: mywhoicd11
+    k8s-app: mywebserver
 spec:
   replicas: 2
   selector:
     matchLabels:
-      k8s-app: mywhoicd11
+      k8s-app: mywebserver
   template:
     metadata:
       labels:
-        k8s-app: mywhoicd11
+        k8s-app: mywebserver
     spec:
       containers:
-      - name: mywhoicd11
-        image: whoicd/icd-api
+      - name: mywebserver
+        image: httpd
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
