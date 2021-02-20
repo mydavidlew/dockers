@@ -17,6 +17,7 @@ $ sudo install -o root -g root -m 0755 kubectl /usr/bin/kubectl
 Get or describe clusters information
 $ kubectl api-resources
 $ kubectl get/describe pods
+$ kubectl get/describe nodes
 $ kubectl get/describe services
 $ kubectl get/describe endpoints
 $ kubectl get/describe namespaces
