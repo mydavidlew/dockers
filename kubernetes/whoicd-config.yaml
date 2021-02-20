@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mywhoicd11
+  namespace: default
+  labels:
+    k8s-app: mywhoicd11
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: mywhoicd11
+  template:
+    metadata:
+      labels:
+        k8s-app: mywhoicd11
+    spec:
+      containers:
+      - name: mywhoicd11
+        image: whoicd/icd-api
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
