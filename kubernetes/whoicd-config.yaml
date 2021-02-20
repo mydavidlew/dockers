@@ -1,3 +1,11 @@
+# This config file contains all config fields with comments
+# NOTE: this is not a particularly useful config file
+#
+# (run) kubectl apply -f kubernetes/whoicd-config.yaml
+# (run) kubectl rollout status deployment/mywhoicd11
+# (run) kubectl edit deployment.v1.apps/mywhoicd11
+# (run) kubectl rollout history deployment.v1.apps/mywhoicd11
+#
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,7 +24,7 @@ spec:
         k8s-app: mywhoicd11
     spec:
       containers:
-      - name: mywhoicd11
+      - name: icd11
         image: whoicd/icd-api
         imagePullPolicy: IfNotPresent
         ports:
