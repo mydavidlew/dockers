@@ -5,8 +5,8 @@
 # (run) kubectl rollout status deployment/mywhoicd11
 # (run) kubectl edit deployment.v1.apps/mywhoicd11
 # (run) kubectl rollout history deployment.v1.apps/mywhoicd11
-# (run) kubectl expose deployment mywhoicd11 --type=ClusterIP --name=mywhoicd11 --port=8083  --target-port=80
-# (run) kubectl port-forward svc/mywhoicd11 8083:8083
+# (run) kubectl expose deployment mywhoicd11 --type=ClusterIP --name=mywhoicd11 --port=80  --target-port=80
+# (run) kubectl port-forward svc/mywhoicd11 8083:80
 #
 apiVersion: apps/v1
 kind: Deployment
