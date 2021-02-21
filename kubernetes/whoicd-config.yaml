@@ -14,16 +14,16 @@ metadata:
   name: mywhoicd11
   namespace: default
   labels:
-    k8s-app: mywhoicd11
+    k8s-app: icd11
 spec:
   replicas: 2
   selector:
     matchLabels:
-      k8s-app: mywhoicd11
+      k8s-app: icd11
   template:
     metadata:
       labels:
-        k8s-app: mywhoicd11
+        k8s-app: icd11
     spec:
       containers:
       - name: icd11
