@@ -1,0 +1,45 @@
+# This config file contains all config fields with comments
+# NOTE: this is not a particularly useful config file
+#
+# (run) kubectl apply -f kubernetes/nginx-deploy.yaml
+# (run) kubectl rollout status deployment/myliteserver
+# (run) kubectl edit deployment.v1.apps/myliteserver
+# (run) kubectl rollout history deployment.v1.apps/myliteserver
+# (run) kubectl expose deployment myliteserver --type=ClusterIP --name=myliteserver --port=80  --target-port=80
+# (run) kubectl port-forward svc/myliteserver 8082:80
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myliteserver
+  namespace: default
+  labels:
+    k8s-app: nginx
+    tier: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      k8s-app: nginx
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        k8s-app: nginx
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /media
+          name: nginx-volume1
+      volumes:
+      - emptyDir: {}
+        name: nginx-volume1
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
