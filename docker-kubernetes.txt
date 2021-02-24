@@ -16,12 +16,12 @@ $ sudo install -o root -g root -m 0755 kubectl /usr/bin/kubectl
 
 Get or describe clusters information
 $ kubectl api-resources
-$ kubectl get/describe pods
-$ kubectl get/describe nodes
-$ kubectl get/describe services
-$ kubectl get/describe endpoints
-$ kubectl get/describe namespaces
-$ kubectl get/describe deployments
+$ kubectl get/describe pods -o wide -A
+$ kubectl get/describe nodes -o wide -A
+$ kubectl get/describe services -o wide -A
+$ kubectl get/describe endpoints -o wide -A
+$ kubectl get/describe namespaces -o wide -A
+$ kubectl get/describe deployments -o wide -A
 
 To restart or reboot all deployment pods
 $ kubectl rollout restart deployment <deployment-name>
