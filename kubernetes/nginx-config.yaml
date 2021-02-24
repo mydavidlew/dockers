@@ -67,6 +67,6 @@ spec:
     protocol: "TCP"
     port: 80
     targetPort: 80
-  externalIPs:
-    - 192.168.1.12
+  #externalIPs:
+  #  - 192.168.1.12
   type: LoadBalancer # or ClusterIP, use NodePort if you are not running Kubernetes on Cloud
