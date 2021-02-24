@@ -1,0 +1,39 @@
+# To test the MetalLB setup and configuration.
+#
+# Deploy the Nginx pods <run> kubectl apply -f kubernetes/nginx-testlb.yaml
+# Get the IP of the Nginx service <run> kubectl get svc -o wide
+# Access the application <run> http://[your_nginx_service_external_ip]
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-testlb
+  namespace: myspace
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-testlb
+  namespace: myspace
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx
+  ports:
+  - port: 80
+    name: http

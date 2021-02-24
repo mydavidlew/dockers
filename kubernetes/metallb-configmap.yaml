@@ -1,3 +1,6 @@
+# Layer 2 Configuration
+# Layer 2 mode is the simplest to configure: in many cases, you don’t need any protocol-specific configuration, only IP addresses.
+# Layer 2 mode does not require the IPs to be bound to the network interfaces of your worker nodes. It works by responding to ARP requests on your local network directly, to give the machine’s MAC address to clients.
 # You will also need a range of IPs on the same subnet than your Kubernetes nodes. These IPs will be used to access your services from the outside. In my case, this range will be 10.10.40.[200-250]/24.
 #
 # Configure MetalLB <run> kubectl apply -f kubernetes/metallb-configmap.yaml
@@ -13,4 +16,4 @@ data:
     - name: default
       protocol: layer2
       addresses:
-      - 192.168.1.50-192.168.1.99
+      - 192.168.1.50-192.168.1.90

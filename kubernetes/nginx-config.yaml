@@ -62,6 +62,7 @@ spec:
   selector: # pod labels should match these
     k8s-app: nginx
     tier: frontend
+  type: LoadBalancer # or ClusterIP, use NodePort if you are not running Kubernetes on Cloud
   ports:
   - name: http
     protocol: "TCP"
@@ -69,4 +70,3 @@ spec:
     targetPort: 80
   #externalIPs:
   #  - 192.168.1.12
-  type: LoadBalancer # or ClusterIP, use NodePort if you are not running Kubernetes on Cloud

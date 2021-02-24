@@ -6,6 +6,15 @@
 # Deploy MetalLB <run> kubectl apply -f kubernetes/metallb-config.yaml
 # Check that MetalLB is running <run> kubectl get pods -n metallb-system
 #
+# If you’re using kube-proxy in IPVS mode, since Kubernetes v1.14.2 you have to enable strict ARP mode.
+# Note, you don’t need this if you’re using kube-router as service-proxy because it is enabling strict arp by default.
+#
+# see what changes would be made, returns nonzero returncode if different
+# <run> kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl diff -f - -n kube-system
+#
+# actually apply the changes, returns nonzero returncode on errors only
+# <run> kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl apply -f - -n kube-system
+#
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -13,19 +22,100 @@ metadata:
   labels:
     app: metallb
 ---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy # added section
+metadata:
+  name: controller
+  namespace: metallb-system
+  labels:
+    app: metallb
+spec:
+  allowPrivilegeEscalation: false
+  allowedCapabilities: []
+  allowedHostPaths: []
+  defaultAddCapabilities: []
+  defaultAllowPrivilegeEscalation: false
+  fsGroup:
+    ranges:
+    - max: 65535
+      min: 1
+    rule: MustRunAs
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  privileged: false
+  readOnlyRootFilesystem: true
+  requiredDropCapabilities:
+  - ALL
+  runAsUser:
+    ranges:
+    - max: 65535
+      min: 1
+    rule: MustRunAs
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    ranges:
+    - max: 65535
+      min: 1
+    rule: MustRunAs
+  volumes:
+  - configMap
+  - secret
+  - emptyDir
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy # added section
+metadata:
+  name: speaker
+  namespace: metallb-system
+  labels:
+    app: metallb
+spec:
+  allowPrivilegeEscalation: false
+  allowedCapabilities:
+  - NET_RAW
+  - NET_ADMIN
+  - SYS_ADMIN
+  allowedHostPaths: []
+  defaultAddCapabilities: []
+  defaultAllowPrivilegeEscalation: false
+  fsGroup:
+    rule: RunAsAny
+  hostIPC: false
+  hostNetwork: true
+  hostPID: false
+  hostPorts:
+  - max: 7472
+    min: 7472
+  privileged: true
+  readOnlyRootFilesystem: true
+  requiredDropCapabilities:
+  - ALL
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+  - configMap
+  - secret
+  - emptyDir
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace: metallb-system
   name: controller
+  namespace: metallb-system
   labels:
     app: metallb
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace: metallb-system
   name: speaker
+  namespace: metallb-system
   labels:
     app: metallb
 ---
@@ -45,6 +135,10 @@ rules:
 - apiGroups: [""]
   resources: ["events"]
   verbs: ["create", "patch"]
+- apiGroups: ["policy"]
+  resourceNames: ["controller"]
+  resources: ["podsecuritypolicies"]
+  verbs: ["use"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -56,37 +150,47 @@ rules:
 - apiGroups: [""]
   resources: ["services", "endpoints", "nodes"]
   verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create", "patch"]
+- apiGroups: ["policy"]
+  resourceNames: ["speaker"]
+  resources: ["podsecuritypolicies"]
+  verbs: ["use"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
+  name: pod-lister
   namespace: metallb-system
-  name: leader-election
   labels:
     app: metallb
 rules:
 - apiGroups: [""]
-  resources: ["endpoints"]
-  resourceNames: ["metallb-speaker"]
-  verbs: ["get", "update"]
-- apiGroups: [""]
-  resources: ["endpoints"]
-  verbs: ["create"]
+  resources: ["pods"]
+  verbs: ["list"]
+- apiGroups: [""]                        # extra
+  resources: ["endpoints"]               # extra
+  resourceNames: ["metallb-speaker"]     # extra
+  verbs: ["get", "update"]               # extra
+- apiGroups: [""]                        # extra
+  resources: ["endpoints"]               # extra
+  verbs: ["create"]                      # extra
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: metallb-system
   name: config-watcher
+  namespace: metallb-system
   labels:
     app: metallb
 rules:
 - apiGroups: [""]
   resources: ["configmaps"]
   verbs: ["get", "list", "watch"]
-- apiGroups: [""]
-  resources: ["events"]
-  verbs: ["create"]
+- apiGroups: [""]                        # extra
+  resources: ["events"]                  # extra
+  verbs: ["create"]                      # extra
 ---
 ## Role bindings
 apiVersion: rbac.authorization.k8s.io/v1
@@ -122,8 +226,8 @@ roleRef:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  namespace: metallb-system
   name: config-watcher
+  namespace: metallb-system
   labels:
     app: metallb
 subjects:
@@ -139,8 +243,8 @@ roleRef:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
+  name: pod-lister
   namespace: metallb-system
-  name: leader-election
   labels:
     app: metallb
 subjects:
@@ -149,13 +253,14 @@ subjects:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: leader-election
+  name: pod-lister
 ---
+# https://hub.docker.com/r/metallb/speaker
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  namespace: metallb-system
   name: speaker
+  namespace: metallb-system
   labels:
     app: metallb
     component: speaker
@@ -176,9 +281,14 @@ spec:
       serviceAccountName: speaker
       terminationGracePeriodSeconds: 0
       hostNetwork: true
+      nodeSelector:
+        kubernetes.io/os: linux
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
       containers:
       - name: speaker
-        image: metallb/speaker:v0.6.1
+        image: metallb/speaker:v0.9.5 # metallb/speaker:v0.6.1
         imagePullPolicy: IfNotPresent
         args:
         - --port=7472
@@ -188,6 +298,28 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
+        - name: METALLB_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: METALLB_ML_BIND_ADDR
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        # needed when another software is also using memberlist / port 7946
+        #- name: METALLB_ML_BIND_PORT
+        #  value: "7946"
+        - name: METALLB_ML_LABELS
+          value: "app=metallb,component=speaker"
+        - name: METALLB_ML_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: METALLB_ML_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: memberlist
+              key: secretkey
         ports:
         - name: monitoring
           containerPort: 7472
@@ -202,13 +334,16 @@ spec:
             drop:
             - all
             add:
-            - net_raw
+            - NET_RAW
+            - NET_ADMIN
+            - SYS_ADMIN
 ---
+# https://hub.docker.com/r/metallb/controller
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: metallb-system
   name: controller
+  namespace: metallb-system
   labels:
     app: metallb
     component: controller
@@ -232,9 +367,11 @@ spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534 # nobody
+      nodeSelector:
+        kubernetes.io/os: linux
       containers:
       - name: controller
-        image: metallb/controller:v0.6.1
+        image: metallb/controller:v0.9.5 # metallb/controller:v0.6.1
         imagePullPolicy: IfNotPresent
         args:
         - --port=7472
