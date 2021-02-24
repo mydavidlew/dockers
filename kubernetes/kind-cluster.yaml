@@ -3,6 +3,8 @@
 #
 # (run) kind create cluster --config kubernetes/kind-cluster.yaml
 # (run) kind delete cluster
+# (run) kubectl create namespace myspace
+# (run) kubectl config set-context — current — namespace=myspace
 #
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
