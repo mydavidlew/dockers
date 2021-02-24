@@ -1,0 +1,55 @@
+# This config file contains all config fields with comments
+# NOTE: this is not a particularly useful config file
+#
+# (run) kubectl apply -f kubernetes/whoicd-config.yaml
+# (run) kubectl rollout status deployment/mywhoicd11
+# (run) kubectl edit deployment.v1.apps/mywhoicd11
+# (run) kubectl rollout history deployment.v1.apps/mywhoicd11
+# (run) kubectl expose deployment mywhoicd11 --type=ClusterIP --name=mywhoicd11 --port=80  --target-port=80
+# (run) kubectl port-forward svc/mywhoicd11 8083:80
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mywhoicd11
+  namespace: myspace
+  labels:
+    k8s-app: icd11
+    tier: icd11api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      k8s-app: icd11
+      tier: icd11api
+  template:
+    metadata:
+      labels:
+        k8s-app: icd11
+        tier: icd11api
+    spec:
+      containers:
+      - name: icd11
+        image: whoicd/icd-api
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mywhoicd11
+  namespace: myspace
+  labels:
+    k8s-app: icd11
+    tier: icd11api
+spec:
+  type: LoadBalancer
+  selector:
+    k8s-app: icd11
+    tier: icd11api
+  ports:
+  - name: http
+    port: 80

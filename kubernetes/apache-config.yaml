@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
       - name: apache2
-        image: httpd
+        image: httpd:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
@@ -69,5 +69,3 @@ spec:
     protocol: "TCP"
     port: 80
     targetPort: 80
-  #externalIPs:
-  #  - 192.168.1.11
