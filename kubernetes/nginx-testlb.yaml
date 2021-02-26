@@ -9,15 +9,20 @@ kind: Deployment
 metadata:
   name: nginx-testlb
   namespace: myspace
+  labels:
+    app: nginx
+    component: testlb
 spec:
   selector:
     matchLabels:
       app: nginx
+      component: testlb
   replicas: 1
   template:
     metadata:
       labels:
         app: nginx
+        component: testlb
     spec:
       containers:
       - name: nginx
@@ -30,10 +35,14 @@ kind: Service
 metadata:
   name: nginx-testlb
   namespace: myspace
+  labels:
+    app: nginx
+    component: testlb
 spec:
   type: LoadBalancer
   selector:
     app: nginx
+    component: testlb
   ports:
   - port: 80
     name: http
