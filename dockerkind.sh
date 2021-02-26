@@ -44,14 +44,22 @@ echo 5 Create the Authorization Token...
 kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user -o jsonpath="{.secrets[0].name}") -o go-template="{{.data.token | base64decode}}" > kubernetes/kubeui-token.txt
 echo
 #
+# Create a Metal Load Balancer in kuberbetes network using mode ipvs and strictARP true. Execute following command:
+echo 6 Create the MetalLB...
+kubectl apply -f kubernetes/metallb-config.yaml
+kubectl apply -f kubernetes/metallb-configmap.yaml
+kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl apply -f - -n kube-system
+echo
+#
 # Create a custom own namespace. Execute following command:
-echo 6 Create the 'myspace' Namespace...
+echo 7 Create the 'myspace' Namespace...
 kubectl create namespace myspace
 kubectl config set-context --current --namespace=myspace
 echo
 #
 # Accessing the Dashboard UI - To protect your cluster data, Dashboard deploys with a minimal RBAC configuration by default. Currently, Dashboard only supports logging in with a Bearer Token. Now copy the token and paste it into Enter token field on the login screen at below url. Click "Sign in" button and that's it. You are now logged in as an admin.
-echo 7 Done successful...
+echo 8 Done successful...
 echo
 kubectl proxy
 # end
