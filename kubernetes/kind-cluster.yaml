@@ -38,8 +38,10 @@ nodes:
 - role: worker
 - role: worker
 - role: worker
+- role: worker
+- role: worker
 networking:
   ipFamily: ipv4
   apiServerAddress: "127.0.0.1"
   apiServerPort: 6443
-  kubeProxyMode: "iptables" # Between "iptables" and "ipvs". By default "iptables" is used
+  kubeProxyMode: "ipvs" # Between "iptables" and "ipvs". By default "iptables" is used

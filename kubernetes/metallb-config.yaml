@@ -4,6 +4,7 @@
 # You will also need a range of IPs on the same subnet than your Kubernetes nodes. These IPs will be used to access your services from the outside. In my case, this range will be 10.10.40.[200-250]/24.
 #
 # Deploy MetalLB <run> kubectl apply -f kubernetes/metallb-config.yaml
+# Create MLSecret <run> kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
 # Check that MetalLB is running <run> kubectl get pods -n metallb-system
 #
 # If you’re using kube-proxy in IPVS mode, since Kubernetes v1.14.2 you have to enable strict ARP mode.
@@ -307,8 +308,8 @@ spec:
             fieldRef:
               fieldPath: status.podIP
         # needed when another software is also using memberlist / port 7946
-        #- name: METALLB_ML_BIND_PORT
-        #  value: "7946"
+        - name: METALLB_ML_BIND_PORT
+          value: "7946"
         - name: METALLB_ML_LABELS
           value: "app=metallb,component=speaker"
         - name: METALLB_ML_NAMESPACE

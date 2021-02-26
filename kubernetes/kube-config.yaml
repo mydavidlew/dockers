@@ -3,21 +3,18 @@
 #
 # (run) kubectl config --kubeconfig=kubernetes/kube-config.yaml set-cluster development --insecure-skip-tls-verify
 # (run) kubectl config --kubeconfig=kubernetes/kube-config.yaml set-cluster production --insecure-skip-tls-verify
+# (run) kubectl config --kubeconfig=kubernetes/kube-config.yaml set-cluster kind-kind
+#
+# (run) kubectl config --kubeconfig=kubernetes/kube-config.yaml set-credentials kind-kind
 #
 # (run) kubectl config --kubeconfig=kubernetes/kube-config.yaml set-context dev-context
 # (run) kubectl config --kubeconfig=kubernetes/kube-config.yaml set-context prod-context
-#
-# (run) kubectl config --kubeconfig=kubernetes/kube-config.yaml set-cluster kind-kind
-# (run) kubectl config --kubeconfig=kubernetes/kube-config.yaml set-credentials kind-kind
 # (run) kubectl config --kubeconfig=kubernetes/kube-config.yaml set-context kind-kind
 #
 # (run) kubectl config --kubeconfig=kubernetes/kube-config.yaml view
 #
 apiVersion: v1
 clusters:
-- cluster:
-    server: https://127.0.0.1
-  name: kind-kind
 - cluster:
     insecure-skip-tls-verify: true
     server: https://127.0.0.1
@@ -26,22 +23,25 @@ clusters:
     insecure-skip-tls-verify: true
     server: https://127.0.0.1
   name: production
+- cluster:
+    server: https://127.0.0.1
+  name: kind-kind
 contexts:
+- context:
+    cluster: development
+    namespace: development
+    user: kind-kind
+  name: dev-context
+- context:
+    cluster: production
+    namespace: production
+    user: kind-kind
+  name: prod-context
 - context:
     cluster: kind-kind
     namespace: default
     user: kind-kind
   name: kind-kind
-- context:
-    cluster: development
-    namespace: default
-    user: kind-kind
-  name: dev-context
-- context:
-    cluster: production
-    namespace: default
-    user: kind-kind
-  name: prod-context
 current-context: kind-kind
 kind: Config
 preferences: {}
