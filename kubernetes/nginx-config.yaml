@@ -14,19 +14,19 @@ metadata:
   name: myliteserver
   namespace: myspace
   labels:
-    k8s-app: nginx
-    tier: frontend
+    app: nginx
+    component: frontend
 spec:
   replicas: 2
   selector:
     matchLabels:
-      k8s-app: nginx
-      tier: frontend
+      app: nginx
+      component: frontend
   template:
     metadata:
       labels:
-        k8s-app: nginx
-        tier: frontend
+        app: nginx
+        component: frontend
     spec:
       containers:
       - name: nginx
@@ -56,12 +56,12 @@ metadata:
   name: myliteserver
   namespace: myspace
   labels:
-    k8s-app: nginx
-    tier: frontend
+    app: nginx
+    component: frontend
 spec:
   selector: # pod labels should match these
-    k8s-app: nginx
-    tier: frontend
+    app: nginx
+    component: frontend
   type: LoadBalancer # or ClusterIP, use NodePort if you are not running Kubernetes on Cloud
   ports:
   - name: http

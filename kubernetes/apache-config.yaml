@@ -15,19 +15,19 @@ metadata:
   name: mywebserver
   namespace: myspace
   labels:
-    k8s-app: apache2
-    tier: frontend
+    app: apache2
+    component: frontend
 spec:
   replicas: 2
   selector:
     matchLabels:
-      k8s-app: apache2
-      tier: frontend
+      app: apache2
+      component: frontend
   template:
     metadata:
       labels:
-        k8s-app: apache2
-        tier: frontend
+        app: apache2
+        component: frontend
     spec:
       containers:
       - name: apache2
@@ -57,12 +57,12 @@ metadata:
   name: mywebserver
   namespace: myspace
   labels:
-    k8s-app: apache2
-    tier: frontend
+    app: apache2
+    component: frontend
 spec:
   selector: # pod labels should match these
-    k8s-app: apache2
-    tier: frontend
+    app: apache2
+    component: frontend
   type: LoadBalancer # or ClusterIP, use NodePort if you are not running Kubernetes on Cloud
   ports:
   - name: http

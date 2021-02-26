@@ -21,7 +21,7 @@ kind: Namespace
 metadata:
   name: metallb-system
   labels:
-    app: metallb
+    k8s-app: metallb
 ---
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy # added section
@@ -29,7 +29,7 @@ metadata:
   name: controller
   namespace: metallb-system
   labels:
-    app: metallb
+    k8s-app: metallb
 spec:
   allowPrivilegeEscalation: false
   allowedCapabilities: []
@@ -71,7 +71,7 @@ metadata:
   name: speaker
   namespace: metallb-system
   labels:
-    app: metallb
+    k8s-app: metallb
 spec:
   allowPrivilegeEscalation: false
   allowedCapabilities:
@@ -110,7 +110,7 @@ metadata:
   name: controller
   namespace: metallb-system
   labels:
-    app: metallb
+    k8s-app: metallb
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -118,14 +118,14 @@ metadata:
   name: speaker
   namespace: metallb-system
   labels:
-    app: metallb
+    k8s-app: metallb
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: metallb-system:controller
   labels:
-    app: metallb
+    k8s-app: metallb
 rules:
 - apiGroups: [""]
   resources: ["services"]
@@ -146,7 +146,7 @@ kind: ClusterRole
 metadata:
   name: metallb-system:speaker
   labels:
-    app: metallb
+    k8s-app: metallb
 rules:
 - apiGroups: [""]
   resources: ["services", "endpoints", "nodes"]
@@ -165,7 +165,7 @@ metadata:
   name: pod-lister
   namespace: metallb-system
   labels:
-    app: metallb
+    k8s-app: metallb
 rules:
 - apiGroups: [""]
   resources: ["pods"]
@@ -184,7 +184,7 @@ metadata:
   name: config-watcher
   namespace: metallb-system
   labels:
-    app: metallb
+    k8s-app: metallb
 rules:
 - apiGroups: [""]
   resources: ["configmaps"]
@@ -199,7 +199,7 @@ kind: ClusterRoleBinding
 metadata:
   name: metallb-system:controller
   labels:
-    app: metallb
+    k8s-app: metallb
 subjects:
 - kind: ServiceAccount
   name: controller
@@ -214,7 +214,7 @@ kind: ClusterRoleBinding
 metadata:
   name: metallb-system:speaker
   labels:
-    app: metallb
+    k8s-app: metallb
 subjects:
 - kind: ServiceAccount
   name: speaker
@@ -230,7 +230,7 @@ metadata:
   name: config-watcher
   namespace: metallb-system
   labels:
-    app: metallb
+    k8s-app: metallb
 subjects:
 - kind: ServiceAccount
   name: controller
@@ -247,7 +247,7 @@ metadata:
   name: pod-lister
   namespace: metallb-system
   labels:
-    app: metallb
+    k8s-app: metallb
 subjects:
 - kind: ServiceAccount
   name: speaker
@@ -263,17 +263,17 @@ metadata:
   name: speaker
   namespace: metallb-system
   labels:
-    app: metallb
+    k8s-app: metallb
     component: speaker
 spec:
   selector:
     matchLabels:
-      app: metallb
+      k8s-app: metallb
       component: speaker
   template:
     metadata:
       labels:
-        app: metallb
+        k8s-app: metallb
         component: speaker
       annotations:
         prometheus.io/scrape: "true"
@@ -346,18 +346,18 @@ metadata:
   name: controller
   namespace: metallb-system
   labels:
-    app: metallb
+    k8s-app: metallb
     component: controller
 spec:
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app: metallb
+      k8s-app: metallb
       component: controller
   template:
     metadata:
       labels:
-        app: metallb
+        k8s-app: metallb
         component: controller
       annotations:
         prometheus.io/scrape: "true"

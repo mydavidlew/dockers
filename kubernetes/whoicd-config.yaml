@@ -14,19 +14,19 @@ metadata:
   name: mywhoicd11
   namespace: myspace
   labels:
-    k8s-app: icd11
-    tier: icd11api
+    app: icd11
+    component: icd11api
 spec:
   replicas: 2
   selector:
     matchLabels:
-      k8s-app: icd11
-      tier: icd11api
+      app: icd11
+      component: icd11api
   template:
     metadata:
       labels:
-        k8s-app: icd11
-        tier: icd11api
+        app: icd11
+        component: icd11api
     spec:
       containers:
       - name: icd11
@@ -43,13 +43,13 @@ metadata:
   name: mywhoicd11
   namespace: myspace
   labels:
-    k8s-app: icd11
-    tier: icd11api
+    app: icd11
+    component: icd11api
 spec:
   type: LoadBalancer
   selector:
-    k8s-app: icd11
-    tier: icd11api
+    app: icd11
+    component: icd11api
   ports:
   - name: http
     port: 80
