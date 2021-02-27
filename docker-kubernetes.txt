@@ -121,8 +121,41 @@ To create a cluster from Kubernetes source:
 $ kind build node-image
 $ kind create cluster --image kindest/node:latest
 
+[[[MetalLB for Kubernetes]]]
+G) MetalLB hooks into your Kubernetes cluster, and provides a network load-balancer implementation. In short, it allows you to create Kubernetes services of type “LoadBalancer” in clusters that don’t run on a cloud provider, and thus cannot simply hook into paid products to provide load-balancers. Once MetalLB has assigned an external IP address to a service, it needs to make the network beyond the cluster aware that the IP “lives” in the cluster. MetalLB uses standard routing protocols to achieve this: ARP, NDP, or BGP.
+
+If you’re using kube-proxy in IPVS mode, since Kubernetes v1.14.2 you have to enable strict ARP mode. Note, you don’t need this if you’re using kube-router as service-proxy because it is enabling strict arp by default.
+You can achieve this by editing kube-proxy config in current cluster:
+$ kubectl edit configmap -n kube-system kube-proxy
+and set:
+>> apiVersion: kubeproxy.config.k8s.io/v1alpha1
+>> kind: KubeProxyConfiguration
+>> mode: "ipvs"
+>> ipvs:
+>>   strictARP: true
+You can also add this configuration snippet to your kubeadm-config, just append it with '---' after the main configuration.
+
+If you are trying to automate this change, these shell snippets may help you:
+-> see what changes would be made, returns nonzero returncode if different
+$ kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl diff -f - -n kube-system
+
+-> actually apply the changes, returns nonzero returncode on errors only
+$ kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl apply -f - -n kube-system
+
+To install MetalLB, apply the manifest:
+$ kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.5/manifests/namespace.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.5/manifests/metallb.yaml
+On first install only
+$ kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+
+This will deploy MetalLB to your cluster, under the 'metallb-system' namespace. The components in the manifest are:
+-> The 'metallb-system/controller' deployment. This is the cluster-wide controller that handles IP address assignments.
+-> The 'metallb-system/speaker' daemonset. This is the component that speaks the protocol(s) of your choice to make the services reachable.
+-> Service accounts for the controller and speaker, along with the RBAC permissions that the components need to function.
+The installation manifest does not include a configuration file. MetalLB’s components will still start, but will remain idle until you define and deploy a configmap. The 'memberlist' secret contains the 'secretkey' to encrypt the communication between speakers for the fast dead node detection.
+
 [[[Deploying the Dashboard UI]]]
-G) Install the Web UI (Dashboard)
+H) Install the Web UI (Dashboard)
 Dashboard is a web-based Kubernetes user interface. You can use Dashboard to deploy containerized applications to a Kubernetes cluster, troubleshoot your containerized application, and manage the cluster resources. You can use Dashboard to get an overview of applications running on your cluster, as well as for creating or modifying individual Kubernetes resources (such as Deployments, Jobs, DaemonSets, etc). For example, you can scale a Deployment, initiate a rolling update, restart a pod or deploy new applications using a deploy wizard. Dashboard also provides information on the state of Kubernetes resources in your cluster and on any errors that may have occurred.
 
 The Dashboard UI is not deployed by default. To deploy it, run the following command:
