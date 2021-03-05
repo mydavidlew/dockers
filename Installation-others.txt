@@ -17,6 +17,7 @@ Docker WHO ICD-11 - https://icd.who.int/icdapi/docs2/ICDAPI-Container-Readme/
 >> # Container swagger endpoint /swagger/index.html
 >> http://localhost/swagger/index.html
 >> # ICD-11 Coding Tool application
+>> http://localhost/ct11/gt
 >> http://localhost/ct11
 
 Docker-superset
