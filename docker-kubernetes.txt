@@ -27,6 +27,11 @@ To restart or reboot all deployment pods
 $ kubectl rollout restart deployment <deployment-name>
 $ kubectl scale deployment <deployment-name> --replicas=0
 
+To display and edit the current kube proxy configuration
+$ kubectl describe -n kube-system cm kube-proxy
+$ kubectl get -n kube-system -o yaml cm kube-proxy
+$ kubectl edit -n kube-system -o yaml cm kube-proxy
+
 Create and expose a new service deployment, next to allow forwarding firewall to public port
 $ kubectl expose deployment <deployment-name> --type=<ClusterIP/NodePort/LoadBalancer/ExternalName> --name=<new-servicename> --port=<ext-port>  --target-port=<int-port>
 $ kubectl port-forward svc/<new-servicename> <public-port>:<ext-port>
