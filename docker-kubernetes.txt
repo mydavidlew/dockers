@@ -127,7 +127,8 @@ $ kind build node-image
 $ kind create cluster --image kindest/node:latest
 
 [[[MetalLB for Kubernetes]]]
-G) MetalLB hooks into your Kubernetes cluster, and provides a network load-balancer implementation. In short, it allows you to create Kubernetes services of type “LoadBalancer” in clusters that don’t run on a cloud provider, and thus cannot simply hook into paid products to provide load-balancers. Once MetalLB has assigned an external IP address to a service, it needs to make the network beyond the cluster aware that the IP “lives” in the cluster. MetalLB uses standard routing protocols to achieve this: ARP, NDP, or BGP.
+G) Reference: https://metallb.universe.tf/ “MetalLB is a load-balancer implementation for bare metal Kubernetes clusters, using standard routing protocols.”
+MetalLB hooks into your Kubernetes cluster, and provides a network load-balancer implementation. In short, it allows you to create Kubernetes services of type “LoadBalancer” in clusters that don’t run on a cloud provider, and thus cannot simply hook into paid products to provide load-balancers. Once MetalLB has assigned an external IP address to a service, it needs to make the network beyond the cluster aware that the IP “lives” in the cluster. MetalLB uses standard routing protocols to achieve this: ARP, NDP, or BGP.
 
 If you’re using kube-proxy in IPVS mode, since Kubernetes v1.14.2 you have to enable strict ARP mode. Note, you don’t need this if you’re using kube-router as service-proxy because it is enabling strict arp by default.
 You can achieve this by editing kube-proxy config in current cluster:
