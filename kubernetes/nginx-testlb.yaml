@@ -17,7 +17,7 @@ spec:
     matchLabels:
       app: nginx
       component: testlb
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -39,10 +39,36 @@ metadata:
     app: nginx
     component: testlb
 spec:
-  type: LoadBalancer
   selector:
     app: nginx
     component: testlb
   ports:
-  - port: 80
-    name: http
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  type: LoadBalancer
+#  externalTrafficPolicy: Local
+#status:
+#  loadBalancer: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-all-ingress-egress
+  namespace: myspace
+  labels:
+    app: nginx
+    component: testlb
+spec:
+  podSelector:
+    matchLabels:
+      app: nginx
+      component: testlb
+  ingress:
+  - {}
+  egress:
+  - {}
+  policyTypes:
+  - Ingress
+  - Egress
