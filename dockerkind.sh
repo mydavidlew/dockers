@@ -76,7 +76,8 @@ EOF
   echo
   #
   # Create a Metal Load Balancer in kuberbetes network using mode ipvs and strictARP true. Execute following command:
-  echo "$(date) $line $$: 6 Create the MetalLB..."
+  echo "$(date) $line $$: 6 Create the Ingress Controller & MetalLB..."
+  kubectl apply -f kubernetes/ingress-config.yaml # https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.45.0/deploy/static/provider/baremetal/deploy.yaml
   kubectl apply -f kubernetes/metallb-config.yaml
   kubectl apply -f kubernetes/metallb-configmap.yaml
   kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
@@ -91,7 +92,7 @@ EOF
   #
   # Accessing the Dashboard UI - To protect your cluster data, Dashboard deploys with a minimal RBAC configuration by default. Currently, Dashboard only supports logging in with a Bearer Token. Now copy the token and paste it into Enter token field on the login screen at below url. Click "Sign in" button and that's it. You are now logged in as an admin.
   echo "$(date) $line $$: 8 Done successful..."
-  echo "http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/"
+  echo http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
   kubectl proxy
 elif [[ $# -eq 1 && $1 == $C_STOP ]] ; then
   check_command $1
