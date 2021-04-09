@@ -160,6 +160,17 @@ This will deploy MetalLB to your cluster, under the 'metallb-system' namespace. 
 -> Service accounts for the controller and speaker, along with the RBAC permissions that the components need to function.
 The installation manifest does not include a configuration file. MetalLB’s components will still start, but will remain idle until you define and deploy a configmap. The 'memberlist' secret contains the 'secretkey' to encrypt the communication between speakers for the fast dead node detection.
 
+Ingress exposes HTTP and HTTPS routes from outside the cluster to services within the cluster. Traffic routing is controlled by rules defined on the Ingress resource. An Ingress may be configured to give Services externally-reachable URLs, load balance traffic, terminate SSL / TLS, and offer name-based virtual hosting.
+An Ingress controller is responsible for fulfilling the Ingress, usually with a load balancer, though it may also configure your edge router or additional frontends to help handle the traffic. An Ingress does not expose arbitrary ports or protocols. Exposing services other than HTTP and HTTPS to the internet typically uses a service of type Service.Type=NodePort or Service.Type=LoadBalancer.
+-> https://kubernetes.io/docs/concepts/services-networking/ingress/
+-> https://kubernetes.github.io/ingress-nginx/deploy/#bare-metal
+
+Bare-metal ingress controller installation, run the following command:
+$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.45.0/deploy/static/provider/baremetal/deploy.yaml
+
+To check if the ingress controller pods have started, run the following command:
+$ kubectl get pods -n ingress-nginx -l app.kubernetes.io/name=ingress-nginx --watch
+
 [[[Deploying the Dashboard UI]]]
 H) Install the Web UI (Dashboard)
 Dashboard is a web-based Kubernetes user interface. You can use Dashboard to deploy containerized applications to a Kubernetes cluster, troubleshoot your containerized application, and manage the cluster resources. You can use Dashboard to get an overview of applications running on your cluster, as well as for creating or modifying individual Kubernetes resources (such as Deployments, Jobs, DaemonSets, etc). For example, you can scale a Deployment, initiate a rolling update, restart a pod or deploy new applications using a deploy wizard. Dashboard also provides information on the state of Kubernetes resources in your cluster and on any errors that may have occurred.
