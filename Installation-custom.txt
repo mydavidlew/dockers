@@ -5,6 +5,7 @@ Docker-ElasticSearch
 >> [https://www.elastic.co/guide/en/elasticsearch/reference/7.2/docker.html]
 >> [ElasticSearch CheatSheet = https://github.com/jolicode/elasticsearch-cheatsheet]
 >> docker pull docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+>> docker run --name=elastic1 --env "discovery.type=single-node" -p 9200:9200 -p 9300:9300 -d docker.elastic.co/elasticsearch/elasticsearch:7.2.0
 >> docker run -it --rm --name=elastic1 --network=appnet --env "discovery.type=single-node" -p 9200:9200 -p 9300:9300 docker.elastic.co/elasticsearch/elasticsearch:7.2.0
 >> docker run --rm --name=elastic1 --network=appnet --env "discovery.type=single-node" --env "cluster.name=elastic-cluster" --mount type=bind,src=/opt/docker/elasticsearch/conf,dst=/usr/share/elasticsearch/config --mount type=bind,src=/opt/docker/elasticsearch/data,dst=/usr/share/elasticsearch/data -p 9200:9200 -p 9300:9300 -d docker.elastic.co/elasticsearch/elasticsearch:7.2.0
 >> docker logs -f elastic1
@@ -25,6 +26,7 @@ Docker-ElasticSearch
 Docker-Kibana
 >> [https://www.elastic.co/guide/en/kibana/7.2/docker.html]
 >> docker pull docker.elastic.co/kibana/kibana:7.2.0
+>> docker run --name=kibana1 --link elastic1:elasticsearch -p 5601:5601 -d docker.elastic.co/kibana/kibana:7.2.0
 >> docker run -it --rm --name=kibana1 --network=appnet --link elastic1:elasticsearch -p 5601:5601 docker.elastic.co/kibana/kibana:7.2.0
 >> docker run --rm --name=kibana1 --network=appnet --link elastic1:elasticsearch --mount type=bind,src=/opt/docker/kibana/conf,dst=/usr/share/kibana/config -p 5601:5601 -d docker.elastic.co/kibana/kibana:7.2.0
 >> docker logs -f kibana1
@@ -39,6 +41,7 @@ Docker-Kibana
 Docker-Logstash
 >> [https://www.elastic.co/guide/en/logstash/7.2/docker.html]
 >> docker pull docker.elastic.co/logstash/logstash:7.2.0
+>> docker run --name=logstash1 --link elastic1:elasticsearch -p 5044:5044 -p 9600:9600 -d docker.elastic.co/logstash/logstash:7.2.0
 >> docker run -it --rm --name=logstash1 --network=appnet --link elastic1:elasticsearch -p 5044:5044 -p 9600:9600 docker.elastic.co/logstash/logstash:7.2.0
 >> docker run --rm --name=logstash1 --network=appnet --link elastic1:elasticsearch --mount type=bind,src=/opt/docker/logstash/conf,dst=/usr/share/logstash/config --mount type=bind,src=/opt/docker/logstash/pipeline,dst=/usr/share/logstash/pipeline -p 5044:5044 -p 9600:9600 -d docker.elastic.co/logstash/logstash:7.2.0
 >> docker logs -f logstash1
