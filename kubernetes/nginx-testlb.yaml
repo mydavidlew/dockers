@@ -1,6 +1,8 @@
 # To test the MetalLB setup and configuration.
 #
 # Deploy the Nginx pods <run> kubectl apply -f kubernetes/nginx-testlb.yaml
+# Expose the Nginx pods <run> kubectl port-forward service/nginx-testlb 8081:80
+# Expose the Nginx pods <run> kubectl port-forward deployment/nginx-testlb 8081:80
 # Get the IP of the Nginx service <run> kubectl get svc -o wide
 # Access the application <run> http://[your_nginx_service_external_ip]
 #
