@@ -24,7 +24,7 @@ kubeadmConfigPatchesJSON6902:
   patch: |
     - op: add
       path: /apiServer/certSANs/-
-      value: my-hostname
+      value: myhostname
 # 1 control plane node and 3 workers
 nodes:
 # the control plane node config
