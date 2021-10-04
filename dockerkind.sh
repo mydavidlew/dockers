@@ -76,14 +76,19 @@ EOF
   echo
   #
   # Create a Metal Load Balancer in kuberbetes network using mode ipvs and strictARP true. Execute following command:
-  echo "$(date) $line $$: 6 Create the Ingress Controller & MetalLB..."
-  kubectl apply -f kubernetes/ingress-config.yaml # https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.45.0/deploy/static/provider/baremetal/deploy.yaml
+  echo "$(date) $line $$: 6 Create the Ingress Controller..."
+  ### kubectl apply -f kubernetes/ingress-config.yaml 
+  kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.45.0/deploy/static/provider/baremetal/deploy.yaml
+  echo
+  #
+  echo "$(date) $line $$: 6 Create the MetalLB..."
   ### kubectl apply -f kubernetes/metallb-namespace.yaml
   ### kubectl apply -f kubernetes/metallb-config.yaml
   kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/namespace.yaml
   kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/metallb.yaml
   kubectl apply -f kubernetes/metallb-configmap.yaml
   kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+  kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl diff -f - -n kube-system
   kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl apply -f - -n kube-system
   echo
   #
