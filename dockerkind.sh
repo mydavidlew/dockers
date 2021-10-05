@@ -32,7 +32,7 @@ if [[ $# -eq 1 && $1 == $C_START ]] ; then
   check_command $1
   echo "$(date) $line $$: $C_COMMAND all kubernetes services"
   # Once you have docker running you can create a cluster with:
-  echo "$(date) $line $$: 1 Deploy Cluster thru KinD..."
+  echo "$(date) $line $$: 1 Deploy Cluster thru KinD - https://kind.sigs.k8s.io/docs/user/configuration/"
   kind create cluster --config kubernetes/kind-cluster.yaml
   echo
   #
