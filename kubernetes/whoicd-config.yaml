@@ -17,11 +17,11 @@ metadata:
     app: icd11
     component: icd11api
 spec:
-  replicas: 2
   selector:
     matchLabels:
       app: icd11
       component: icd11api
+  replicas: 1
   template:
     metadata:
       labels:
@@ -46,10 +46,32 @@ metadata:
     app: icd11
     component: icd11api
 spec:
-  type: LoadBalancer
   selector:
     app: icd11
     component: icd11api
   ports:
   - name: http
-    port: 80
+    port: 8082
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mywhoicd11
+  namespace: myspace
+  labels:
+    app: icd11
+    component: icd11api
+spec:
+  rules:
+  - http:
+      paths:
+      - pathType: Prefix
+        path: "/icd11"
+        backend:
+          service:
+            name: mywhoicd11
+            port:
+              number: 8082
