@@ -1,6 +1,7 @@
 # To test the Ingress NGINX Controller setup and configuration.
 #
 # Deploy the Nginx pods <run> kubectl apply -f kubernetes/using-ingress.yaml
+# Deploy the Nginx pods <run> kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/usage.yaml
 # Access the application <run> http://[your_nginx_service_external_ip]
 # - should output "foo"
 #          curl localhost/foo
