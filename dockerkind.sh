@@ -37,8 +37,8 @@ if [[ $# -eq 1 && $1 == $C_START ]] ; then
   echo
   #
   # The Dashboard UI is not deployed by default. To deploy it, run the following command:
-  echo "$(date) $line $$: 2 Deploy Dashboard UI..."
-  kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
+  echo "$(date) $line $$: 2 Deploy Dashboard UI - https://github.com/kubernetes/dashboard#kubernetes-dashboard"
+  kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.3.1/aio/deploy/recommended.yaml
   echo
   #
   # Creating a Service Account. We are creating Service Account with name "admin-user" in namespace "kubernetes-dashboard" first.
@@ -76,7 +76,7 @@ EOF
   echo
   #
   # Create a Metal Load Balancer in kuberbetes network using mode ipvs and strictARP true. Execute following command:
-  echo "$(date) $line $$: 6 Create the Ingress Controller..." # https://kubernetes.github.io/ingress-nginx/deploy/#bare-metal
+  echo "$(date) $line $$: 6 Create the Ingress Controller - https://kubernetes.github.io/ingress-nginx/deploy/#bare-metal"
   ###kubectl apply -f kubernetes/ingress-config.yaml
   # Bare-metal (Using NodePort)
   ###kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.0.3/deploy/static/provider/baremetal/deploy.yaml
@@ -84,7 +84,7 @@ EOF
   ###kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.0.3/deploy/static/provider/cloud/deploy.yaml
   echo "Skipping..."
   #
-  echo "$(date) $line $$: 6 Create the MetalLB..." # https://metallb.universe.tf/installation/
+  echo "$(date) $line $$: 6 Create the MetalLB - https://metallb.universe.tf/installation/"
   ###kubectl apply -f kubernetes/metallb-namespace.yaml
   ###kubectl apply -f kubernetes/metallb-config.yaml
   kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/namespace.yaml
