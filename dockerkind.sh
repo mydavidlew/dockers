@@ -78,8 +78,11 @@ EOF
   # Create a Metal Load Balancer in kuberbetes network using mode ipvs and strictARP true. Execute following command:
   echo "$(date) $line $$: 6 Create the Ingress Controller..." # https://kubernetes.github.io/ingress-nginx/deploy/#bare-metal
   ###kubectl apply -f kubernetes/ingress-config.yaml
-  kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.0.3/deploy/static/provider/baremetal/deploy.yaml
-  echo
+  # Bare-metal (Using NodePort)
+  ###kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.0.3/deploy/static/provider/baremetal/deploy.yaml
+  # Docker Desktop
+  ###kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.0.3/deploy/static/provider/cloud/deploy.yaml
+  echo "Skipping..."
   #
   echo "$(date) $line $$: 6 Create the MetalLB..." # https://metallb.universe.tf/installation/
   ###kubectl apply -f kubernetes/metallb-namespace.yaml
