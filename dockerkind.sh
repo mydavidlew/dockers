@@ -76,14 +76,14 @@ EOF
   echo
   #
   # Create a Metal Load Balancer in kuberbetes network using mode ipvs and strictARP true. Execute following command:
-  echo "$(date) $line $$: 6 Create the Ingress Controller..."
-  ### kubectl apply -f kubernetes/ingress-config.yaml 
-  kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.45.0/deploy/static/provider/baremetal/deploy.yaml
+  echo "$(date) $line $$: 6 Create the Ingress Controller..." # https://kubernetes.github.io/ingress-nginx/deploy/#bare-metal
+  ###kubectl apply -f kubernetes/ingress-config.yaml
+  kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.0.3/deploy/static/provider/baremetal/deploy.yaml
   echo
   #
-  echo "$(date) $line $$: 6 Create the MetalLB..."
-  ### kubectl apply -f kubernetes/metallb-namespace.yaml
-  ### kubectl apply -f kubernetes/metallb-config.yaml
+  echo "$(date) $line $$: 6 Create the MetalLB..." # https://metallb.universe.tf/installation/
+  ###kubectl apply -f kubernetes/metallb-namespace.yaml
+  ###kubectl apply -f kubernetes/metallb-config.yaml
   kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/namespace.yaml
   kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/metallb.yaml
   kubectl apply -f kubernetes/metallb-configmap.yaml
