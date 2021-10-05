@@ -95,14 +95,18 @@ EOF
   kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl apply -f - -n kube-system
   echo
   #
+  echo "$(date) $line $$: 7 Create the Ingress NGINX Controller - https://kind.sigs.k8s.io/docs/user/ingress/#ingress-nginx"
+  kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+  echo
+  #
   # Create a custom own namespace. Execute following command:
-  echo "$(date) $line $$: 7 Create the 'myspace' Namespace..."
+  echo "$(date) $line $$: 8 Create the 'myspace' Namespace..."
   kubectl create namespace myspace
   kubectl config set-context --current --namespace=myspace
   echo
   #
   # Accessing the Dashboard UI - To protect your cluster data, Dashboard deploys with a minimal RBAC configuration by default. Currently, Dashboard only supports logging in with a Bearer Token. Now copy the token and paste it into Enter token field on the login screen at below url. Click "Sign in" button and that's it. You are now logged in as an admin.
-  echo "$(date) $line $$: 8 Done successful..."
+  echo "$(date) $line $$: 9 Done successful..."
   echo http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
   kubectl proxy
 elif [[ $# -eq 1 && $1 == $C_STOP ]] ; then
