@@ -48,4 +48,6 @@ networking:
   # By default the API server listens on a random open port.
   # You may choose a specific port but probably don't need to in most cases. Using a random port makes it easier to spin up multiple clusters.
   apiServerPort: 6443
+  podSubnet: "10.244.0.0/16" # configure the subnet used for pod IPs by setting
+  serviceSubnet: "10.96.0.0/12" # configure the Kubernetes service subnet used for service IPs by setting
   kubeProxyMode: "ipvs" # Between "iptables" and "ipvs". By default "iptables" is used
