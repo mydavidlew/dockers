@@ -49,32 +49,32 @@ spec:
     port: 8081
     protocol: TCP
     targetPort: 80
-#  type: LoadBalancer
-#  externalTrafficPolicy: Cluster
-#status:
-#  loadBalancer: {}
+  type: LoadBalancer
+  externalTrafficPolicy: Cluster
+status:
+  loadBalancer: {}
 ---
-#apiVersion: networking.k8s.io/v1
-#kind: NetworkPolicy
-#metadata:
-#  name: allow-all-ingress-egress
-#  namespace: myspace
-#  labels:
-#    app: nginx
-#    component: testlb
-#spec:
-#  podSelector:
-#    matchLabels:
-#      app: nginx
-#      component: testlb
-#  ingress:
-#  - {}
-#  egress:
-#  - {}
-#  policyTypes:
-#  - Ingress
-#  - Egress
-#---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-all-ingress-egress
+  namespace: myspace
+  labels:
+    app: nginx
+    component: testlb
+spec:
+  podSelector:
+    matchLabels:
+      app: nginx
+      component: testlb
+  ingress:
+  - {}
+  egress:
+  - {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
