@@ -88,7 +88,7 @@ metadata:
 #    service:
 #      name: nginx-testlb
 #      port:
-#        number: 80
+#        number: 8081
 spec:
   rules:
   - http:
