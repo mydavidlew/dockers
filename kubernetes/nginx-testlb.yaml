@@ -57,7 +57,7 @@ status:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-all-ingress-egress
+  name: nginx-testlb # allow-all-ingress-egress
   namespace: myspace
   labels:
     app: nginx
@@ -78,7 +78,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: test-ingress
+  name: nginx-testlb
   namespace: myspace
   labels:
     app: nginx
@@ -91,7 +91,8 @@ metadata:
 #        number: 8081
 spec:
   rules:
-  - http:
+  - host: localhost
+    http:
       paths:
       - pathType: Prefix
         path: "/testlb"
