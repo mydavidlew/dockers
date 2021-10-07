@@ -4,6 +4,8 @@
 # Deploy the Nginx pods <run> kubectl run -i -t busybox --image=radial/busyboxplus:curl
 # Deploy the Nginx pods <run> kubectl attach -i -t busybox -c busybox
 # Deploy the Nginx pods <run> kubectl exec -i -t deploy/busybox -- sh
+# Deploy the Nginx pods <run> kubectl exec -i -t deploy/busybox -- nslookup nginx-testlb
+# Deploy the Nginx pods <run> kubectl exec -i -t deploy/busybox -- nslookup foobar-service
 #
 apiVersion: apps/v1
 kind: Deployment
