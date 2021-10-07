@@ -38,6 +38,7 @@ if [[ $# -eq 1 && $1 == $C_START ]] ; then
   #
   # Create a KinD Ingress Controller in kuberbetes network. Execute following command:
   echo "$(date) $line $$: 2 Create the Ingress Ambassador/Contour/[NGINX] Controller - https://kind.sigs.k8s.io/docs/user/ingress/#ingress-nginx"
+  ###kubectl apply -f kubernetes/ingress-config.yaml
   kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
   echo
   #
