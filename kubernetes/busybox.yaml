@@ -1,0 +1,29 @@
+# Create a temporary busybox workspace to use
+#
+# Deploy the Nginx pods <run> kubectl apply -f kubernetes/busybox.yaml
+# Deploy the Nginx pods <run> kubectl run -i -t busybox --image=radial/busyboxplus:curl
+# Deploy the Nginx pods <run> kubectl attach -i -t busybox -c busybox
+# Deploy the Nginx pods <run> kubectl exec -i -t deploy/busybox -- sh
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox
+  namespace: myspace
+spec:
+  selector:
+    matchLabels:
+      app: busybox
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: busybox
+    spec:
+      containers:
+      - name: busybox
+        command:
+          - sh
+          - -c
+          - while true; do sleep 1; done
+        image: radial/busyboxplus:curl
