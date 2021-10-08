@@ -67,13 +67,24 @@ if [[ $# -eq 1 && $1 == $C_START ]] ; then
   kubectl apply -f kubernetes/metric-config.yaml
   echo
   #
+  # The Portainer Community Edition is not deployed by default. To deploy it, run the following command:
+  echo "$(date) $line $$: 5 Deploy Portainer Community - https://docs.portainer.io/v/ce-2.9/start/install/server/kubernetes"
+  # To expose via NodePort, you can use the following command (Portainer will be available on port 30777 for HTTP [http://localhost:30777/] and 30779 for HTTPS [https://localhost:30779/]):
+  ###kubectl apply -n portainer -f https://raw.githubusercontent.com/portainer/k8s/master/deploy/manifests/portainer/portainer.yaml
+  # To expose via Load Balancer, this command will provision Portainer at an assigned Load Balancer IP on port 9000 for HTTP [http://<loadbalancer_IP>:9000/] and 9443 for HTTPS [https://<loadbalancer_IP>:9443/]:
+  ###kubectl apply -n portainer -f https://raw.githubusercontent.com/portainer/k8s/master/deploy/manifests/portainer/portainer-lb.yaml
+  kubectl apply -f kubernetes/portainer-config.yaml
+  # To explicitly set the target node when deploying using YAML manifests, run the following one-liner to "patch" the deployment, forcing the pod to always be scheduled on the node it's currently running on:
+  kubectl patch deployments -n portainer portainer -p '{"spec": {"template": {"spec": {"nodeSelector": {"kubernetes.io/hostname": "'$(kubectl get pods -n portainer -o jsonpath='{ ..nodeName }')'"}}}}}' || (echo Failed to identify current node of portainer pod; exit 1)
+  echo
+  #
   # The Dashboard UI is not deployed by default. To deploy it, run the following command:
-  echo "$(date) $line $$: 5 Deploy Dashboard UI - https://github.com/kubernetes/dashboard#kubernetes-dashboard"
+  echo "$(date) $line $$: 6 Deploy Dashboard UI - https://github.com/kubernetes/dashboard#kubernetes-dashboard"
   kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.3.1/aio/deploy/recommended.yaml
   echo
   #
   # Creating a Service Account. We are creating Service Account with name "admin-user" in namespace "kubernetes-dashboard" first.
-  echo "$(date) $line $$: 6 Create admin-user account..."
+  echo "$(date) $line $$: 7 Create admin-user account..."
   cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: ServiceAccount
@@ -84,7 +95,7 @@ EOF
   echo
   #
   # Creating a ClusterRoleBinding. In most cases after provisioning cluster using "kops", "kubeadm" or any other popular tool, the "ClusterRole" "cluster-admin" already exists in the cluster. We can use it and create only "ClusterRoleBinding" for our "ServiceAccount". If it does not exist then you need to create this role first and grant required privileges manually.
-  echo "$(date) $line $$: 7 Create user ServiceAccount..."
+  echo "$(date) $line $$: 8 Create user ServiceAccount..."
   cat <<EOF | kubectl apply -f -
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -102,11 +113,11 @@ EOF
   echo
   #
   # Getting a Bearer Token - Now we need to find token we can use to log in. Execute following command:
-  echo "$(date) $line $$: 8 Create the Authorization Token..."
+  echo "$(date) $line $$: 9 Create the Authorization Token..."
   kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user -o jsonpath="{.secrets[0].name}") -o go-template="{{.data.token | base64decode}}" > kubernetes/kubeui-token.txt
   echo
   #
-  echo "$(date) $line $$: 9 Create the Ingress Controller - https://kubernetes.github.io/ingress-nginx/deploy/#bare-metal"
+  echo "$(date) $line $$: 10 Create the Ingress Controller - https://kubernetes.github.io/ingress-nginx/deploy/#bare-metal"
   # Bare-metal (Using NodePort)
   ###kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.0.3/deploy/static/provider/baremetal/deploy.yaml
   # Docker Desktop
@@ -114,13 +125,13 @@ EOF
   echo "Skipping..."
   #
   # Create a custom own namespace. Execute following command:
-  echo "$(date) $line $$: 10 Create the 'myspace' Namespace..."
+  echo "$(date) $line $$: 11 Create the 'myspace' Namespace..."
   kubectl create namespace myspace
   kubectl config set-context --current --namespace=myspace
   echo
   #
   # Accessing the Dashboard UI - To protect your cluster data, Dashboard deploys with a minimal RBAC configuration by default. Currently, Dashboard only supports logging in with a Bearer Token. Now copy the token and paste it into Enter token field on the login screen at below url. Click "Sign in" button and that's it. You are now logged in as an admin.
-  echo "$(date) $line $$: 11 Done successful..."
+  echo "$(date) $line $$: 12 Done successful..."
   echo http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
   kubectl proxy
 elif [[ $# -eq 1 && $1 == $C_STOP ]] ; then
