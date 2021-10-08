@@ -1,3 +1,7 @@
+#
+# kubectl config set-context --current --namespace=portainer
+# kubectl port-forward deployment/portainer 9000:9000
+#
 ---
 # Source: portainer/templates/namespace.yaml
 apiVersion: v1
