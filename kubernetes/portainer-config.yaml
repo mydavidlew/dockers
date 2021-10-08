@@ -1,6 +1,8 @@
 #
 # kubectl config set-context --current --namespace=portainer
-# kubectl port-forward deployment/portainer 9000:9000
+# kubectl apply -f kubernetes/portainer-config.yaml
+# kubectl patch deployments -n portainer portainer -p '{"spec": {"template": {"spec": {"nodeSelector": {"kubernetes.io/hostname": "'$(kubectl get pods -n portainer -o jsonpath='{ ..nodeName }')'"}}}}}' || (echo Failed to identify current node of portainer pod; exit 1)
+# kubectl port-forward -n portainer deployment/portainer 9000:9000
 #
 ---
 # Source: portainer/templates/namespace.yaml
@@ -123,7 +125,7 @@ spec:
       containers:
         - name: portainer
           image: "portainer/portainer-ce:latest"
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           args:          
           volumeMounts:
             - name: data
