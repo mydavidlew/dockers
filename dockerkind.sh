@@ -95,8 +95,29 @@ if [[ $# -eq 1 && $1 == $C_START ]] ; then
   kubectl apply -f kubernetes/metric-config.yaml
   sleep $SLEEP_INT; echo
   #
+  # The Dashboard UI is not deployed by default. To deploy it, run the following command:
+  echo "$(date) $line $$: 5 Deploy Dashboard UI - https://github.com/kubernetes/dashboard#kubernetes-dashboard"
+  kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.3.1/aio/deploy/recommended.yaml
+  sleep $SLEEP_INT; echo
+  #
+  # Creating a Service Account. We are creating Service Account with name "admin-user" in namespace "kubernetes-dashboard" first.
+  echo "$(date) $line $$: 6 Create admin-user account..."
+  set_ServiceAccount
+  sleep $SLEEP_INT; echo
+  #
+  # Creating a ClusterRoleBinding. In most cases after provisioning cluster using "kops", "kubeadm" or any other popular tool, the "ClusterRole" "cluster-admin" already exists in the cluster. We can use it and create only "ClusterRoleBinding" for our "ServiceAccount". If it does not exist then you need to create this role first and grant required privileges manually.
+  echo "$(date) $line $$: 7 Create user ServiceAccount..."
+  set_ClusterRoleBinding
+  sleep $SLEEP_INT; echo
+  #
+  # Getting a Bearer Token - Now we need to find token we can use to log in. Execute following command:
+  echo "$(date) $line $$: 8 Create the Authorization Token..."
+  kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user -o jsonpath="{.secrets[0].name}") -o go-template="{{.data.token | base64decode}}" > kubernetes/kubeui-token.txt
+  echo "Token in kubernetes/kubeui-token.txt file"
+  sleep $SLEEP_INT; echo
+  #
   # The Portainer Community Edition is not deployed by default. To deploy it, run the following command:
-  echo "$(date) $line $$: 5 Deploy Portainer Community - https://docs.portainer.io/v/ce-2.9/start/install/server/kubernetes"
+  echo "$(date) $line $$: 9 Deploy Portainer Community - https://docs.portainer.io/v/ce-2.9/start/install/server/kubernetes"
   # To expose via NodePort, you can use the following command (Portainer will be available on port 30777 for HTTP [http://localhost:30777/] and 30779 for HTTPS [https://localhost:30779/]):
   ###kubectl apply -n portainer -f https://raw.githubusercontent.com/portainer/k8s/master/deploy/manifests/portainer/portainer.yaml
   # To expose via Load Balancer, this command will provision Portainer at an assigned Load Balancer IP on port 9000 for HTTP [http://<loadbalancer_IP>:9000/] and 9443 for HTTPS [https://<loadbalancer_IP>:9443/]:
@@ -105,29 +126,7 @@ if [[ $# -eq 1 && $1 == $C_START ]] ; then
   # To explicitly set the target node when deploying using YAML manifests, run the following one-liner to "patch" the deployment, forcing the pod to always be scheduled on the node it's currently running on:
   kubectl patch deployments -n portainer portainer -p '{"spec": {"template": {"spec": {"nodeSelector": {"kubernetes.io/hostname": "'$(kubectl get pods -n portainer -o jsonpath='{ ..nodeName }')'"}}}}}' || (echo Failed to identify current node of portainer pod; exit 1)
   echo "Portainer at http://localhost:9000/#!/home"
-  echo "kubectl config set-context --current --namespace=portainer"
-  echo "kubectl port-forward deployment/portainer 9000:9000"
-  sleep $SLEEP_INT; echo
-  #
-  # The Dashboard UI is not deployed by default. To deploy it, run the following command:
-  echo "$(date) $line $$: 6 Deploy Dashboard UI - https://github.com/kubernetes/dashboard#kubernetes-dashboard"
-  kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.3.1/aio/deploy/recommended.yaml
-  sleep $SLEEP_INT; echo
-  #
-  # Creating a Service Account. We are creating Service Account with name "admin-user" in namespace "kubernetes-dashboard" first.
-  echo "$(date) $line $$: 7 Create admin-user account..."
-  set_ServiceAccount
-  sleep $SLEEP_INT; echo
-  #
-  # Creating a ClusterRoleBinding. In most cases after provisioning cluster using "kops", "kubeadm" or any other popular tool, the "ClusterRole" "cluster-admin" already exists in the cluster. We can use it and create only "ClusterRoleBinding" for our "ServiceAccount". If it does not exist then you need to create this role first and grant required privileges manually.
-  echo "$(date) $line $$: 8 Create user ServiceAccount..."
-  set_ClusterRoleBinding
-  sleep $SLEEP_INT; echo
-  #
-  # Getting a Bearer Token - Now we need to find token we can use to log in. Execute following command:
-  echo "$(date) $line $$: 9 Create the Authorization Token..."
-  kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user -o jsonpath="{.secrets[0].name}") -o go-template="{{.data.token | base64decode}}" > kubernetes/kubeui-token.txt
-  echo "Token in kubernetes/kubeui-token.txt file"
+  echo "kubectl port-forward -n portainer deployment/portainer 9000:9000"
   sleep $SLEEP_INT; echo
   #
   echo "$(date) $line $$: 10 Create the Ingress Controller - https://kubernetes.github.io/ingress-nginx/deploy/#bare-metal"
