@@ -151,8 +151,16 @@ elif [[ $# -eq 2 && $1 == $C_START && $2 == $APP_PORTAINER ]] ; then
   #
   # Accessing the Portainer UI - To protect your cluster data, Portainer deploys with a minimal RBAC configuration by default. Click "Sign in" button and that's it. You are now logged in as an admin.
   echo "$(date) $line $$: 2 Done successful..."
-  echo "Portainer at http://localhost:9000/#!/home"
-  echo "kubectl port-forward -n portainer deployment/portainer 9000:9000"
+  # Run the Portainer expose command using "kubectl port-forward -n portainer deployment/portainer 9000:9000"
+  while [ true ]; do
+    echo -e "*\c"; sleep 1
+    cmd=$(kubectl get pods -n portainer -o json | jq '.items[].status.containerStatuses[] | select(.started == true) | {state}' | jq '.state.running.startedAt')
+    if [ ! -z $cmd ]; then
+      echo -e "\n$cmd Portainer at http://localhost:9000/#!/home"
+      kubectl port-forward -n portainer deployment/portainer 9000:9000
+      exit
+    fi
+  done
 elif [[ $# -eq 2 && $1 == $C_STOP && $2 == $APP_PORTAINER ]] ; then
   # The Portainer Community Edition is not deployed by default. To delete it, run the following command:
   echo "$(date) $line $$: 1 Delete Portainer Community - https://docs.portainer.io/v/ce-2.9/start/install/server/kubernetes"
