@@ -181,6 +181,6 @@ elif [[ $# -eq 1 && $1 == $C_STOP ]] ; then
   echo "$(date) $line $$: $C_COMMAND all kubernetes services"
   kind delete cluster
 else
-  echo "$(date) $line $$: You have gone to the wrong party! use '$0 $C_START/$C_STOP'"
+  echo "$(date) $line $$: You have gone to the wrong party! use '$0 $C_START/$C_STOP $APP_DASHBOARD/$APP_PORTAINER/$APP_INGRESS'"
 fi
 # end
