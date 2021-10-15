@@ -152,13 +152,13 @@ elif [[ $# -eq 2 && $1 == $C_START && $2 == $APP_PORTAINER ]] ; then
   # Accessing the Portainer UI - To protect your cluster data, Portainer deploys with a minimal RBAC configuration by default. Click "Sign in" button and that's it. You are now logged in as an admin.
   echo "$(date) $line $$: 2 Done successful..."
   # Run the Portainer expose command using "kubectl port-forward -n portainer deployment/portainer 9000:9000"
-  while [ true ]; do
+  while [[ true ]]; do
     echo -e "*\c"; sleep 1
     cmd=$(kubectl get pods -n portainer -o json | jq '.items[].status.containerStatuses[] | select(.started == true) | {state}' | jq '.state.running.startedAt')
-    if [ ! -z $cmd ]; then
+    if [[ ! -z $cmd ]]; then
       echo -e "\n$cmd Portainer at http://localhost:9000/#!/home"
       kubectl port-forward -n portainer deployment/portainer 9000:9000
-      exit
+      break
     fi
   done
 elif [[ $# -eq 2 && $1 == $C_STOP && $2 == $APP_PORTAINER ]] ; then
