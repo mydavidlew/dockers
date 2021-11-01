@@ -146,8 +146,9 @@ elif [[ $# -eq 2 && $1 == $C_START && $2 == $APP_PORTAINER ]] ; then
   sleep $SLEEP_INT; echo
   #
   # To explicitly set the target node when deploying using YAML manifests, run the following one-liner to "patch" the deployment, forcing the pod to always be scheduled on the node it's currently running on:
-  kubectl patch deployments -n portainer portainer -p '{"spec": {"template": {"spec": {"nodeSelector": {"kubernetes.io/hostname": "'$(kubectl get pods -n portainer -o jsonpath='{ ..nodeName }')'"}}}}}' || (echo Failed to identify current node of portainer pod; exit 1)
-  echo
+  # ---No need to run this patch---
+  ##kubectl patch deployments -n portainer portainer -p '{"spec": {"template": {"spec": {"nodeSelector": {"kubernetes.io/hostname": "'$(kubectl get pods -n portainer -o jsonpath='{ ..nodeName }')'"}}}}}' || (echo Failed to identify current node of portainer pod; exit 1)
+  ##echo
   #
   # Accessing the Portainer UI - To protect your cluster data, Portainer deploys with a minimal RBAC configuration by default. Click "Sign in" button and that's it. You are now logged in as an admin.
   echo "$(date) $line $$: 2 Done successful..."
