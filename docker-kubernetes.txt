@@ -111,6 +111,7 @@ F) KinD: Kubernetes in Docker like Docker in Docker, but for Kubernetes!
 KinD or Kubernetes in Docker is a suite of tools for local Kubernetes “clusters” where each “node” is a Docker container. KinD was primarily designed for testing Kubernetes itself, but may be used for local development or CI. kind is divided into go packages implementing most of the functionality, a command line for users, and a “node” base image. The intent is that the kind the suite of packages should eventually be importable and reusable by other tools (e.g. kubetest) while the CLI provides a quick way to use and debug these packages.
 
 $ curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.10.0/kind-linux-amd64
+$ curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
 $ sudo install -o root -g root -m 0755 kind /usr/bin/kind
 $ kind version
 
