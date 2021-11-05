@@ -150,6 +150,9 @@ $ kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP:
 $ kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl apply -f - -n kube-system
 
 To install MetalLB, apply the manifest:
+$>kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/master/manifests/namespace.yaml
+$>kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/master/manifests/metallb.yaml
+$>#ubectl apply -f https://kind.sigs.k8s.io/examples/loadbalancer/metallb-configmap.yaml
 $ kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.5/manifests/namespace.yaml
 $ kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.5/manifests/metallb.yaml
 On first install only
