@@ -1,0 +1,154 @@
+version: '2.2'
+services:
+  elasticsearch01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
+    container_name: elasticsearch01
+    environment:
+      - node.name=elasticsearch01
+      - cluster.name=elasticsearch-cluster
+      - discovery.seed_hosts=elasticsearch02,elasticsearch03
+      - cluster.initial_master_nodes=elasticsearch01,elasticsearch02,elasticsearch03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch01_data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elasticsearch_network
+  elasticsearch02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
+    container_name: elasticsearch02
+    environment:
+      - node.name=elasticsearch02
+      - cluster.name=elasticsearch-cluster
+      - discovery.seed_hosts=elasticsearch01,elasticsearch03
+      - cluster.initial_master_nodes=elasticsearch01,elasticsearch02,elasticsearch03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch02_data:/usr/share/elasticsearch/data
+    networks:
+      - elasticsearch_network
+  elasticsearch03:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
+    container_name: elasticsearch03
+    environment:
+      - node.name=elasticsearch03
+      - cluster.name=elasticsearch-cluster
+      - discovery.seed_hosts=elasticsearch01,elasticsearch02
+      - cluster.initial_master_nodes=elasticsearch01,elasticsearch02,elasticsearch03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch03_data:/usr/share/elasticsearch/data
+    networks:
+      - elasticsearch_network
+
+  zookeeper01:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper01
+    environment:
+      - ZOO_SERVER_ID=1
+      - ZOO_SERVERS=0.0.0.0:2888:3888::1,zookeeper02:2888:3888::2
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOO_PORT_NUMBER=2181
+      - ZOO_TICK_TIME=2000
+    volumes:
+      - zookeeper01_data:/bitnami/zookeeper
+    ports:
+      - 12181:2181
+    networks:
+      - kafka_network
+  zookeeper02:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper02
+    environment:
+      - ZOO_SERVER_ID=2
+      - ZOO_SERVERS=zookeeper01:2888:3888::1,0.0.0.0:2888:3888::2
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOO_PORT_NUMBER=2181
+      - ZOO_TICK_TIME=2000
+    volumes:
+      - zookeeper02_data:/bitnami/zookeeper
+    ports:
+      - 22181:2181
+    networks:
+      - kafka_network
+  
+  kafka01:
+    image: bitnami/kafka:latest
+    container_name: kafka01
+    depends_on:
+      - zookeeper01
+      - zookeeper02
+    environment:
+      - KAFKA_BROKER_ID=1
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper01:2181,zookeeper02:2181
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:19092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka01:9092,EXTERNAL://localhost:19092
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+    volumes:
+      - kafka01_data:/bitnami/kafka
+    ports:
+      - 19092:9092
+    networks:
+      - kafka_network
+  kafka02:
+    image: bitnami/kafka:latest
+    container_name: kafka02
+    depends_on:
+      - zookeeper01
+      - zookeeper02
+    environment:
+      - KAFKA_BROKER_ID=2
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper01:2181,zookeeper02:2181
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:29092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka02:9092,EXTERNAL://localhost:29092
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+    volumes:
+      - kafka02_data:/bitnami/kafka
+    ports:
+      - 29092:9092
+    networks:
+      - kafka_network
+
+volumes:
+  elasticsearch01_data:
+    driver: local
+  elasticsearch02_data:
+    driver: local
+  elasticsearch03_data:
+    driver: local
+  zookeeper01_data:
+    driver: local
+  zookeeper02_data:
+    driver: local
+  kafka01_data:
+    driver: local
+  kafka02_data:
+    driver: local
+
+networks:
+  elasticsearch_network:
+    driver: bridge
+  kafka_network:
+    driver: bridge
