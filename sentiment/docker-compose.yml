@@ -146,9 +146,19 @@ volumes:
     driver: local
   kafka02_data:
     driver: local
+#volumes:
+#  superset_home:
+#    external: false
 
+#networks:
+#  elasticsearch_network:
+#    driver: bridge
+#  kafka_network:
+#    driver: bridge
 networks:
   elasticsearch_network:
-    driver: bridge
+    external:
+      name: appnet
   kafka_network:
-    driver: bridge
+    external:
+      name: appnet
