@@ -158,7 +158,7 @@ elif [[ $# -eq 2 && $1 == $C_START && $2 == $APP_PORTAINER ]] ; then
     cmd=$(kubectl get pods -n portainer -o json | jq '.items[].status.containerStatuses[] | select(.started == true) | {state}' | jq '.state.running.startedAt')
     if [[ ! -z $cmd ]]; then
       echo -e "\n$cmd Portainer at http://localhost:9000/#!/home"
-      kubectl port-forward -n portainer deployment/portainer 9000:9000
+      kubectl port-forward -n portainer deployment/portainer 9000:9000 --address localhost,0.0.0.0
       break
     fi
   done
