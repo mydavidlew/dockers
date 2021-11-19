@@ -1,6 +1,8 @@
 # [[[Deploying Elasticsearch on Kubernetes]]]
 # Elasticsearch node discovery through Headless Service & Elasticsearch cluster using StatefulSet
 # https://blog.knoldus.com/deploying-elasticsearch-on-kubernetes/
+# https://dzone.com/articles/running-elasticsearch-on-kubernetes
+# https://www.elastic.co/elastic-cloud-kubernetes
 #
 # We have used multiple initContainers to setup our node before running the Elasticsearch image. Let us look into them one-by-one:
 # - fix-the-volume-permission: This is to fix the volume permission because by default Elasticsearch container is not run as non root user.
