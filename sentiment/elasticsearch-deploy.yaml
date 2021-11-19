@@ -30,7 +30,7 @@ metadata:
   labels:
     service: elasticsearch
 spec:
-  clusterIP: None
+  clusterIP: None # Setting the clusterIP field in a service spec to 'None' makes the service headless.
   ports:
   - name: serving
     port: 9200
