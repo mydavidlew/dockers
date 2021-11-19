@@ -1,0 +1,63 @@
+# <cmd> kubectl apply -f zookeeper-deploy.yaml
+#
+# zookeeper-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper
+  namespace: myspace
+  labels:
+    app: zookeeper-1
+spec:
+  ports:
+  - name: client
+    port: 2181
+    targetPort: 2181
+    protocol: TCP
+  - name: follower
+    port: 2888
+    targetPort: 2888
+    protocol: TCP
+  - name: leader
+    port: 3888
+    targetPort: 3888
+    protocol: TCP
+  selector:
+    app: zookeeper
+---
+# zookeeper-deploy.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper
+  namespace: myspace
+  labels:
+    app: zookeeper-1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: zookeeper-1
+  template:
+    metadata:
+      labels:
+        app: zookeeper-1
+    spec:
+      containers:
+      - name: zookeeper
+        image: bitnami/zookeeper:latest
+        ports:
+        - containerPort: 2181
+          name: http
+        resources: {}
+        env:
+          - name: ALLOW_ANONYMOUS_LOGIN
+            value: "yes"
+          - name: ZOO_SERVER_ID
+            value: "1"
+          - name: ZOO_TICK_TIME
+            value: "2000"
+          - name: ZOO_PORT_NUMBER
+            value: "2181"
+          - name: ZOO_SERVERS
+            value: 0.0.0.0:2888:3888::1,zookeeper:2888:3888::2
