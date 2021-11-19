@@ -1,3 +1,6 @@
+# K8s: Deployments vs StatefulSets vs DaemonSets
+# https://medium.com/stakater/k8s-deployments-vs-statefulsets-vs-daemonsets-60582f0c62d4
+
 # Deployment is the easiest and most used resource for deploying your application. It is a Kubernetes controller that matches the current state of your cluster to the desired state mentioned in the Deployment manifest. It will check that the desired state of ReplicaSet with the current state, if not match it will create a ReplicaSet.
 #
 ###counter-deployment.yaml###
