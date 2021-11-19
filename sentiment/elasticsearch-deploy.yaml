@@ -28,7 +28,7 @@ metadata:
   name: elasticsearch
   namespace: myspace
   labels:
-    service: elasticsearch
+    service: elasticsearch-svc
 spec:
   clusterIP: None # Setting the clusterIP field in a service spec to 'None' makes the service headless.
   ports:
@@ -41,7 +41,7 @@ spec:
     targetPort: 9300
     protocol: TCP
   selector:
-    service: elasticsearch
+    service: elasticsearch-svc
 ---
 # elasticsearch-statefulset.yaml
 apiVersion: apps/v1
@@ -50,13 +50,13 @@ metadata:
   name: elasticsearch
   namespace: myspace
   labels:
-    service: elasticsearch
+    service: elasticsearch-svc
 spec:
   replicas: 3
   serviceName: elasticsearch
   selector:
     matchLabels:
-      service: elasticsearch
+      service: elasticsearch-svc
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -70,7 +70,7 @@ spec:
   template:
     metadata:
       labels:
-        service: elasticsearch
+        service: elasticsearch-svc
     spec:
       terminationGracePeriodSeconds: 300
       affinity:
@@ -81,7 +81,7 @@ spec:
               - key: service
                 operator: In
                 values:
-                - elasticsearch
+                - elasticsearch-svc
             topologyKey: "kubernetes.io/hostname"
       initContainers:
       - name: fix-the-volume-permission
