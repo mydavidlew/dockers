@@ -1,0 +1,116 @@
+# Deployment is the easiest and most used resource for deploying your application. It is a Kubernetes controller that matches the current state of your cluster to the desired state mentioned in the Deployment manifest. It will check that the desired state of ReplicaSet with the current state, if not match it will create a ReplicaSet.
+#
+###counter-deployment.yaml###
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: counter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: counter
+  template:
+    metadata:
+      labels:
+        app: counter
+    spec:
+      containers:
+      - name: counter
+        image: "kahootali/counter:1.1"
+        volumeMounts:
+        - name: counter
+          mountPath: /app/
+      volumes:
+      - name: counter
+        persistentVolumeClaim:
+          claimName: counter
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: counter
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Mi
+  storageClassName: efs
+
+# StatefulSet(stable-GA in k8s v1.9) is a Kubernetes resource used to manage stateful applications. It manages the deployment and scaling of a set of Pods, and provides guarantee about the ordering and uniqueness of these Pods.
+#
+###counter-statefulset.yaml###
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: counter
+spec:
+  serviceName: "counter-app"
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: counter
+  template:
+    metadata:
+      labels:
+        app: counter
+    spec:      
+      containers:
+      - name: counter
+        image: "kahootali/counter:1.1"  
+        volumeMounts:
+        - name: counter
+          mountPath: /app/      
+  volumeClaimTemplates:
+  - metadata:
+      name: counter
+    spec:
+      accessModes: [ "ReadWriteMany" ]
+      storageClassName: efs
+      resources:
+        requests:
+          storage: 50Mi
+
+# A DaemonSet is a controller that ensures that the pod runs on all the nodes of the cluster. If a node is added/removed from a cluster, DaemonSet automatically adds/deletes the pod.
+#
+###counter-daemonset.yaml###
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: counter-app
+spec:  
+  selector:
+    matchLabels:
+      app: counter
+  template:
+    metadata:
+      name: counter-app
+      labels:
+        app: counter
+    spec:
+      tolerations: 
+      - effect: NoSchedule
+        operator: Exists
+      containers:
+      - name: counter
+        image: "kahootali/counter:1.1"
+        volumeMounts:
+        - name: counter
+          mountPath: /app/
+      volumes:
+      - name: counter
+        persistentVolumeClaim:
+          claimName: counter
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: counter
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Mi
+  storageClassName: efs
