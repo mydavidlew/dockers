@@ -1,59 +1,100 @@
+# apiVersion: storage.k8s.io/v1
+# kind: StorageClass
+# metadata:
+#   name: local-storage
+# provisioner: rancher.io/local-path
+# volumeBindingMode: WaitForFirstConsumer
+# ---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kafka-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: local-storage
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: '/mnt/data'
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kafka-pv-claim
+  namespace: myspace
+spec:
+  storageClassName: local-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: kafka-service
+  name: kafka-svc
+  namespace: myspace
   labels:
-    name: kafka
+    app: kafka-app
 spec:
+  clusterIP: None
   ports:
-  - port: 9092
-    name: kafka-port
-    protocol: TCP
+    - name: '9092'
+      port: 9092
+      protocol: TCP
+      targetPort: 9092
   selector:
-    app: kafka
-    id: "0"
-  type: LoadBalancer
+    app: kafka-app
 ---
-kind: Deployment
 apiVersion: apps/v1
+kind: StatefulSet
 metadata:
-  name: kafka-broker0
+  name: kafka
+  namespace: myspace
+  labels:
+    app: kafka-app
 spec:
-  replicas: 2
+  replicas: 3
+  serviceName: kafka-svc
   selector:
     matchLabels:
-        app: kafka
-        id: "0"
+      app: kafka-app
   template:
     metadata:
       labels:
-        app: kafka
-        id: "0"
+        app: kafka-app
     spec:
+      volumes:
+        - name: kafka-storage
+          persistentVolumeClaim:
+            claimName: kafka-pv-claim
       containers:
-      - name: kafka
-        image: bitnami/kafka:latest
-        ports:
-        - containerPort: 9092
-        env:
-        - name: KAFKA_BROKER_ID
-          value: "0"
-        - name: ALLOW_PLAINTEXT_LISTENER
-          value: "yes"
-        - name: KAFKA_ZOOKEEPER_CONNECT
-          value: zookeeper01:2181,zookeeper02:2181
-        - name: KAFKA_ADVERTISED_HOST_NAME
-          value: 192.168.1.240
-        - name: KAFKA_CREATE_TOPICS
-          value: admintome-test:1:1
-        resources: {}
-
-    environment:
-      - KAFKA_BROKER_ID=1
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper01:2181,zookeeper02:2181
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:19092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka01:9092,EXTERNAL://localhost:19092
-      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+        - name: kafka-container
+          image: bitnami/kafka:latest
+          ports:
+            - containerPort: 9092
+            - containerPort: 9093
+          env:
+            - name: ALLOW_PLAINTEXT_LISTENER
+              value: "yes"
+            - name: KAFKA_BROKER_ID
+              value: "1"
+            - name: KAFKA_CFG_ZOOKEEPER_CONNECT
+              value: zookeeper01:2181,zookeeper02:2181
+            - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
+              value: CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+            - name: KAFKA_CFG_LISTENERS
+              value: CLIENT://:9092,EXTERNAL://:19092
+            - name: KAFKA_CFG_ADVERTISED_LISTENERS
+              value: CLIENT://kafka01:9092,EXTERNAL://localhost:19092
+            - name: KAFKA_INTER_BROKER_LISTENER_NAME
+              value: CLIENT
+            - name: KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE
+              value: "true"
+          volumeMounts:
+            - name: kafka-storage
+              mountPath: /mnt/kafka
