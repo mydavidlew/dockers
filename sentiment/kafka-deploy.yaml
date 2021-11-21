@@ -9,9 +9,10 @@
 # <cmd> kubectl exec -i -t deploy/busybox -- nslookup ka-headless
 #       Server:    10.96.0.10
 #       Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
-#       Name:      zk-headless
-#       Address 1: 10.244.1.8 zookeeper-0.zk-headless.myspace.svc.cluster.local
-#       Address 2: 10.244.3.9 zookeeper-1.zk-headless.myspace.svc.cluster.local
+#       Name:      ka-headless
+#       Address 1: 10.244.3.26 kafka-2.ka-headless.myspace.svc.cluster.local
+#       Address 2: 10.244.3.24 kafka-1.ka-headless.myspace.svc.cluster.local
+#       Address 3: 10.244.3.23 kafka-0.ka-headless.myspace.svc.cluster.local
 #
 # <cmd> for i in 0 1 2; do echo "myid kafka-$i";kubectl exec kafka-$i -- cat /bitnami/kafka/data/myid; done
 # <cmd> for i in 0 1 2; do kubectl exec kafka-$i -- hostname -f; done
@@ -28,34 +29,6 @@
 # provisioner: rancher.io/local-path
 # volumeBindingMode: WaitForFirstConsumer
 # ---
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: kafka-pv-volume
-  labels:
-    type: local
-spec:
-  storageClassName: local-storage
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: '/mnt/data'
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: kafka-pv-claim
-  namespace: myspace
-spec:
-  storageClassName: local-storage
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 3Gi
----
 # kafka-service.yaml
 apiVersion: v1
 kind: Service
@@ -63,49 +36,81 @@ metadata:
   name: ka-headless
   namespace: myspace
   labels:
-    app: ka-headless
+    kaapp: ka-headless
 spec:
-  clusterIP: None
+  clusterIP: None # Setting the clusterIP field in a service spec to 'None' makes the service headless.
   ports:
-    - name: '9092'
+    - name: client
       port: 9092
       targetPort: 9092
       protocol: TCP
-    - name: '9093'
+    - name: server
       port: 9093
       targetPort: 9093
       protocol: TCP
   selector:
-    app: kafka
+    kaapp: kafka
 ---
+# kafka-statefulset.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: kafka
   namespace: myspace
   labels:
-    app: kafka
+    kaapp: kafka
 spec:
   replicas: 3
   serviceName: ka-headless
   selector:
     matchLabels:
-      app: kafka
+      kaapp: kafka
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      storageClassName: local-storage
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 3Gi
   template:
     metadata:
       labels:
-        app: kafka
+        kaapp: kafka
     spec:
-      volumes:
-      - name: kafka-storage
-        persistentVolumeClaim:
-          claimName: kafka-pv-claim
+      terminationGracePeriodSeconds: 300
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: px/running
+                operator: NotIn
+                values:
+                - "false"
+              - key: px/enabled
+                operator: NotIn
+                values:
+                - "false"
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "kaapp"
+                    operator: In
+                    values: 
+                    - ka-headless
+              topologyKey: "kubernetes.io/hostname"
       containers:
-      - name: kafka-container
+      - name: kafka
         image: bitnami/kafka:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 9092
+          name: client
         - containerPort: 9093
+          name: server
         resources:
           requests:
             memory: 1Gi
@@ -114,20 +119,26 @@ spec:
         env:
         - name: ALLOW_PLAINTEXT_LISTENER
           value: "yes"
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
 #       - name: KAFKA_BROKER_ID
-#         value: "1"
+#         valueFrom:
+#           fieldRef:
+#             fieldPath: metadata.annotations[$(ordinal)]
         - name: KAFKA_CFG_ZOOKEEPER_CONNECT
           value: zookeeper-0.zk-headless.myspace.svc.cluster.local:2181,zookeeper-1.zk-headless.myspace.svc.cluster.local:2181
         - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
           value: CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
         - name: KAFKA_CFG_LISTENERS
-          value: CLIENT://:9092,EXTERNAL://:19092
+          value: CLIENT://:9092,EXTERNAL://:9093
         - name: KAFKA_CFG_ADVERTISED_LISTENERS
-          value: CLIENT://kafka01:9092,EXTERNAL://localhost:19092
+          value: CLIENT://$(MY_POD_NAME).ka-headless.myspace.svc.cluster.local:9092,EXTERNAL://localhost:9093
         - name: KAFKA_INTER_BROKER_LISTENER_NAME
           value: CLIENT
         - name: KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE
           value: "true"
         volumeMounts:
-        - name: kafka-storage
+        - name: data
           mountPath: /mnt/kafka

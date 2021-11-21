@@ -35,7 +35,7 @@ metadata:
   name: zk-headless
   namespace: myspace
   labels:
-    app: zk-headless
+    zkapp: zk-headless
 spec:
   clusterIP: None # Setting the clusterIP field in a service spec to 'None' makes the service headless.
   ports:
@@ -52,7 +52,7 @@ spec:
     targetPort: 3888
     protocol: TCP
   selector:
-    app: zookeeper
+    zkapp: zookeeper
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -67,20 +67,20 @@ data:
   snap.retain: "3"
   purge.interval: "1"
 ---
-# zookeeper-deploy.yaml
+# zookeeper-statefulset.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: zookeeper
   namespace: myspace
   labels:
-    app: zookeeper
+    zkapp: zookeeper
 spec:
   replicas: 2
   serviceName: zk-headless
   selector:
     matchLabels:
-      app: zookeeper
+      zkapp: zookeeper
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -93,7 +93,7 @@ spec:
   template:
     metadata:
       labels:
-        app: zookeeper
+        zkapp: zookeeper
     spec:
       terminationGracePeriodSeconds: 300
       affinity:
@@ -113,7 +113,7 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchExpressions:
-                  - key: "app"
+                  - key: "zkapp"
                     operator: In
                     values: 
                     - zk-headless
