@@ -132,6 +132,7 @@ spec:
             SVR_IDX=$((IDX+1))
             echo $SVR_IDX > "/bitnami/zookeeper/data/myid"
             export 'ZOO_SERVER_ID=$SVR_IDX' && exec "$@"
+            echo # export ZOO_SERVER_ID=$((${HOSTNAME##*-} + 1))
           fi
         env:
         - name: HOSTNAME
@@ -161,29 +162,29 @@ spec:
           limits:
             memory: 2Gi
         env:
-          - name: ALLOW_ANONYMOUS_LOGIN
-            value: "yes"
-#         - name: ZOO_SERVER_ID
-#           value: "1"
-          - name: ZOO_TICK_TIME
-            valueFrom:
-              configMapKeyRef:
-                name: zk-config
-                key: tick
-          - name: ZOO_INIT_LIMIT
-            valueFrom:
-              configMapKeyRef:
-                name: zk-config
-                key: init
-          - name: ZOO_SYNC_LIMIT
-            valueFrom:
-              configMapKeyRef:
-                name: zk-config
-                key: sync
-          - name: ZOO_PORT_NUMBER
-            value: "2181"
-          - name: ZOO_SERVERS
-            value: "zookeeper-0.zk-headless.myspace.svc.cluster.local:2888:3888,zookeeper-1.zk-headless.myspace.svc.cluster.local:2888:3888"
+        - name: ALLOW_ANONYMOUS_LOGIN
+          value: "yes"
+#       - name: ZOO_SERVER_ID
+#         value: "1"
+        - name: ZOO_TICK_TIME
+          valueFrom:
+            configMapKeyRef:
+              name: zk-config
+              key: tick
+        - name: ZOO_INIT_LIMIT
+          valueFrom:
+            configMapKeyRef:
+              name: zk-config
+              key: init
+        - name: ZOO_SYNC_LIMIT
+          valueFrom:
+            configMapKeyRef:
+              name: zk-config
+              key: sync
+        - name: ZOO_PORT_NUMBER
+          value: "2181"
+        - name: ZOO_SERVERS
+          value: "zookeeper-0.zk-headless.myspace.svc.cluster.local:2888:3888,zookeeper-1.zk-headless.myspace.svc.cluster.local:2888:3888"
         volumeMounts:
         - name: data
           mountPath: /bitnami/zookeeper
