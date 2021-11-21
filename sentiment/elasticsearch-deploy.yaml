@@ -12,15 +12,25 @@
 #
 # <cmd> kubectl apply -f elasticsearch-deploy.yaml
 # <cmd> kubectl port-forward -n myspace statefulset/elasticsearch 9200:9200
+# <cmd> kubectl exec -i -t deploy/busybox -- nslookup es-headless
+#       Server:    10.96.0.10
+#       Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+#       Name:      es-headless
+#       Address 1: 10.244.3.7 elasticsearch-2.es-headless.myspace.svc.cluster.local
+#       Address 2: 10.244.3.5 elasticsearch-0.es-headless.myspace.svc.cluster.local
+#       Address 3: 10.244.1.6 elasticsearch-1.es-headless.myspace.svc.cluster.local
+#
+# <cmd> for i in 0 1 2; do kubectl exec elasticsearch-$i -- hostname -f; done
+# <cmd> for i in 0 1 2; do kubectl get pod elasticsearch-$i --template {{.spec.nodeName}}; echo ""; done
 #
 # elasticsearch-storage.yaml
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: local-storage
-provisioner: rancher.io/local-path
-volumeBindingMode: WaitForFirstConsumer
----
+# apiVersion: storage.k8s.io/v1
+# kind: StorageClass
+# metadata:
+#   name: local-storage
+# provisioner: rancher.io/local-path
+# volumeBindingMode: WaitForFirstConsumer
+# ---
 # elasticsearch-service.yaml
 apiVersion: v1
 kind: Service
@@ -61,9 +71,8 @@ spec:
   - metadata:
       name: data
     spec:
-      accessModes:
-        - ReadWriteOnce
       storageClassName: local-storage
+      accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
           storage: 10Gi
@@ -98,10 +107,11 @@ spec:
       initContainers:
       - name: fix-the-volume-permission
         image: busybox
+        imagePullPolicy: IfNotPresent
         command:
         - sh
         - -c
-        - chown -R 1000:1000 /usr/share/elasticsearch/data
+        - chown -R 1000 /usr/share/elasticsearch/data
         securityContext:
           privileged: true
         volumeMounts:
@@ -109,6 +119,7 @@ spec:
           mountPath: /usr/share/elasticsearch/data
       - name: increase-the-vm-max-map-count
         image: busybox
+        imagePullPolicy: IfNotPresent
         command:
         - sysctl
         - -w
@@ -117,6 +128,7 @@ spec:
           privileged: true
       - name: increase-the-ulimit
         image: busybox
+        imagePullPolicy: IfNotPresent
         command:
         - sh
         - -c
@@ -126,6 +138,7 @@ spec:
       containers:
       - name: elasticsearch
         image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 9200
           name: http

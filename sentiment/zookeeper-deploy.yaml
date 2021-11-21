@@ -1,13 +1,33 @@
+# [[[Deploying ZooKeeper on Kubernetes]]]
+# ZooKeeper node discovery through Headless Service & ZooKeeper cluster using StatefulSet
+# https://kubernetes.io/docs/tutorials/stateful-application/zookeeper/
+# https://medium.com/kafka-in-kubernetes/deploying-zookeeper-cluster-3acdcc7ed340
+# https://portworx.com/blog/run-ha-kafka-rancher-kubernetes-engine/
+#
 # <cmd> kubectl apply -f zookeeper-deploy.yaml
+# <cmd> kubectl port-forward -n myspace statefulset/zookeeper 2181:2181
+# <cmd> kubectl exec -i -t deploy/busybox -- nslookup zk-headless
+#       Server:    10.96.0.10
+#       Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+#       Name:      zk-headless
+#       Address 1: 10.244.1.8 zookeeper-0.zk-headless.myspace.svc.cluster.local
+#       Address 2: 10.244.3.9 zookeeper-1.zk-headless.myspace.svc.cluster.local
+#
+# <cmd> for i in 0 1 2; do echo "myid zookeeper-$i";kubectl exec zookeeper-$i -- cat /bitnami/zookeeper/data/myid; done
+# <cmd> for i in 0 1 2; do kubectl exec zookeeper-$i -- hostname -f; done
+# <cmd> kubectl exec zookeeper-0 -- cat /opt/bitnami/zookeeper/conf/zoo.cfg
+# <cmd> for i in 0 1 2; do kubectl get pod zookeeper-$i --template {{.spec.nodeName}}; echo ""; done
+# <cmd> kubectl exec zookeeper-0 -- /opt/bitnami/zookeeper/bin/zkCli.sh create /hello world
+# <cmd> kubectl exec zookeeper-1 -- /opt/bitnami/zookeeper/bin/zkCli.sh get /hello
 #
 # zookeeper-storage.yaml
-#apiVersion: storage.k8s.io/v1
-#kind: StorageClass
-#metadata:
-#  name: local-storage
-#provisioner: rancher.io/local-path
-#volumeBindingMode: WaitForFirstConsumer
-#---
+# apiVersion: storage.k8s.io/v1
+# kind: StorageClass
+# metadata:
+#   name: local-storage
+# provisioner: rancher.io/local-path
+# volumeBindingMode: WaitForFirstConsumer
+# ---
 # zookeeper-service.yaml
 apiVersion: v1
 kind: Service
@@ -33,6 +53,19 @@ spec:
     protocol: TCP
   selector:
     app: zookeeper
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zk-config
+  namespace: myspace
+data:
+  tick: "2000"
+  init: "100"
+  sync: "5"
+  client.cnxns: "60"
+  snap.retain: "3"
+  purge.interval: "1"
 ---
 # zookeeper-deploy.yaml
 apiVersion: apps/v1
@@ -85,29 +118,72 @@ spec:
                     values: 
                     - zk-headless
               topologyKey: "kubernetes.io/hostname"
+      initContainers:
+      - name: assign-id-to-zoo-server-id
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        command:
+        - /bin/sh
+        - -c
+        - |-
+          set -ex;
+          if [[ -f "/bitnami/zookeeper/data/myid" ]]; then
+            IDX="$(echo $HOSTNAME | rev | cut -d "-" -f1 | rev)"
+            SVR_IDX=$((IDX+1))
+            echo $SVR_IDX > "/bitnami/zookeeper/data/myid"
+            export 'ZOO_SERVER_ID=$SVR_IDX' && exec "$@"
+          fi
+        env:
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        securityContext:
+          runAsUser: 0
+          privileged: true
+        volumeMounts:
+        - name: data
+          mountPath: /bitnami/zookeeper
       containers:
       - name: zookeeper
         image: bitnami/zookeeper:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 2181
           name: client
         - containerPort: 2888
-          name: server
+          name: leaderport
         - containerPort: 3888
-          name: leader-election
-        resources: {}
+          name: electionport
+        resources:
+          requests:
+            memory: 1Gi
+          limits:
+            memory: 2Gi
         env:
           - name: ALLOW_ANONYMOUS_LOGIN
             value: "yes"
 #         - name: ZOO_SERVER_ID
 #           value: "1"
           - name: ZOO_TICK_TIME
-            value: "2000"
+            valueFrom:
+              configMapKeyRef:
+                name: zk-config
+                key: tick
+          - name: ZOO_INIT_LIMIT
+            valueFrom:
+              configMapKeyRef:
+                name: zk-config
+                key: init
+          - name: ZOO_SYNC_LIMIT
+            valueFrom:
+              configMapKeyRef:
+                name: zk-config
+                key: sync
           - name: ZOO_PORT_NUMBER
             value: "2181"
           - name: ZOO_SERVERS
-            value: zookeeper-0.zk-headless.myspace.svc.cluster.local:2888:3888,zookeeper-1.zk-headless.myspace.svc.cluster.local:2888:3888
-#           value: zookeeper-0:2888:3888::1,zookeeper-1:2888:3888::2
+            value: "zookeeper-0.zk-headless.myspace.svc.cluster.local:2888:3888,zookeeper-1.zk-headless.myspace.svc.cluster.local:2888:3888"
         volumeMounts:
         - name: data
           mountPath: /bitnami/zookeeper
