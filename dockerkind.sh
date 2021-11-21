@@ -57,6 +57,17 @@ subjects:
 EOF
 }
 
+function set_StorageClass() {
+  cat <<EOF | kubectl apply -f -
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: rancher.io/local-path
+volumeBindingMode: WaitForFirstConsumer
+EOF
+}
+
 if [[ $# -eq 1 && $1 == $C_START ]] ; then
   check_command $1
   echo "$(date) $line $$: $C_COMMAND all kubernetes services"
@@ -100,6 +111,7 @@ if [[ $# -eq 1 && $1 == $C_START ]] ; then
   echo "$(date) $line $$: 5 Create the 'myspace' Namespace..."
   kubectl create namespace myspace
   kubectl config set-context --current --namespace=myspace
+  set_StorageClass # create a local storage
   sleep $SLEEP_INT; echo
   #
   # Display the cluster information. Execute following command:
@@ -147,8 +159,8 @@ elif [[ $# -eq 2 && $1 == $C_START && $2 == $APP_PORTAINER ]] ; then
   #
   # To explicitly set the target node when deploying using YAML manifests, run the following one-liner to "patch" the deployment, forcing the pod to always be scheduled on the node it's currently running on:
   # ---No need to run this patch---
-  ##kubectl patch deployments -n portainer portainer -p '{"spec": {"template": {"spec": {"nodeSelector": {"kubernetes.io/hostname": "'$(kubectl get pods -n portainer -o jsonpath='{ ..nodeName }')'"}}}}}' || (echo Failed to identify current node of portainer pod; exit 1)
-  ##echo
+## kubectl patch deployments -n portainer portainer -p '{"spec": {"template": {"spec": {"nodeSelector": {"kubernetes.io/hostname": "'$(kubectl get pods -n portainer -o jsonpath='{ ..nodeName }')'"}}}}}' || (echo Failed to identify current node of portainer pod; exit 1)
+## echo
   #
   # Accessing the Portainer UI - To protect your cluster data, Portainer deploys with a minimal RBAC configuration by default. Click "Sign in" button and that's it. You are now logged in as an admin.
   echo "$(date) $line $$: 2 Done successful..."
@@ -158,7 +170,7 @@ elif [[ $# -eq 2 && $1 == $C_START && $2 == $APP_PORTAINER ]] ; then
     cmd=$(kubectl get pods -n portainer -o json | jq '.items[].status.containerStatuses[] | select(.started == true) | {state}' | jq '.state.running.startedAt')
     if [[ ! -z $cmd ]]; then
       echo -e "\n$cmd Portainer at http://localhost:9000/#!/home"
-      kubectl port-forward -n portainer deployment/portainer 9000:9000 --address localhost,0.0.0.0
+      kubectl port-forward -n portainer deployment/portainer 9000:9000 #--address localhost,0.0.0.0
       break
     fi
   done
