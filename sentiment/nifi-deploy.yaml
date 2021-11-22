@@ -1,0 +1,88 @@
+# [[[Deploying Nifi on Kubernetes]]]
+# Nifi node discovery through Headless Service & Nifi cluster using StatefulSet
+# https://nifi.apache.org/docs/nifi-docs/html/administration-guide.html#how-to-install-and-start-nifi
+# https://github.com/VChiranjeeviVeerni/nifi-kube-setup/blob/master/nifi-replicaset-cluster-zk.yaml
+# https://github.com/VChiranjeeviVeerni/nifi-kube-setup/blob/master/zookeeper/zookeeper-setup.yaml
+# https://github.com/m-hogue/nifi-k8s
+#
+# <cmd> kubectl apply -f nifi-deploy.yaml
+# <cmd> kubectl port-forward -n myspace deploy/nifi 8080:8080
+# <cmd> kubectl exec -i -t deploy/busybox -- nslookup nifi-service
+# kubectl exec pod/<nifi-pod> -- cat /opt/nifi/nifi-current/conf/nifi.properties | grep nifi.sensitive.props.key
+#
+# NiFi Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nifi-service
+  namespace: myspace
+  labels:
+    zkapp: nifi-service
+spec:
+  type: LoadBalancer
+  ports:
+    - name: ui
+      protocol: TCP
+      targetPort: 8080
+      port: 8080
+    - name: node-protocol-port
+      protocol: TCP
+      targetPort: 9088
+      port: 9088
+    - name: s2s
+      protocol: TCP
+      targetPort: 8888
+      port: 8888
+  selector:
+    my.app.nifi: nifi
+---
+# NiFi Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nifi
+  namespace: myspace
+  labels:
+    zkapp: nifi
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      my.app.nifi: nifi
+  template:
+    metadata:
+      labels:
+        my.app.nifi: nifi
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: nifi
+          image: apache/nifi:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 22
+              name: ssh
+          resources:
+            requests:
+              cpu: ".5"
+              memory: ".5Gi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          env:
+            - name: VERSION
+              value: "1.15.0"
+            - name: NIFI_CLUSTER_IS_NODE
+              value: "true"
+            - name: NIFI_SENSITIVE_PROPS_KEY
+              value: "abcdefghijkl1234567890" # Key Password length less than required [12]
+            - name: NIFI_CLUSTER_NODE_PROTOCOL_PORT
+              value: "9088"
+            - name: NIFI_ELECTION_MAX_CANDIDATES
+              value: "1"
+            - name: NIFI_ELECTION_MAX_WAIT
+              value: "5 mins"
+            - name: NIFI_ZK_CONNECT_STRING
+              value: "zookeeper-0.zk-headless.myspace.svc.cluster.local:2181,zookeeper-1.zk-headless.myspace.svc.cluster.local:2181"
