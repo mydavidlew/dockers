@@ -1,6 +1,7 @@
 # [[[Deploying Nifi on Kubernetes]]]
 # Nifi node discovery through Headless Service & Nifi cluster using StatefulSet
 # https://nifi.apache.org/docs/nifi-docs/html/administration-guide.html#how-to-install-and-start-nifi
+# https://medium.com/swlh/operationalising-nifi-on-kubernetes-1a8e0ae16a6c
 # https://github.com/VChiranjeeviVeerni/nifi-kube-setup/blob/master/nifi-replicaset-cluster-zk.yaml
 # https://github.com/VChiranjeeviVeerni/nifi-kube-setup/blob/master/zookeeper/zookeeper-setup.yaml
 # https://github.com/m-hogue/nifi-k8s
