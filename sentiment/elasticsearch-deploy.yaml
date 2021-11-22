@@ -38,7 +38,7 @@ metadata:
   name: es-headless
   namespace: myspace
   labels:
-    service: es-headless
+    esapp: es-headless
 spec:
   clusterIP: None # Setting the clusterIP field in a service spec to 'None' makes the service headless.
   ports:
@@ -51,7 +51,7 @@ spec:
     targetPort: 9300
     protocol: TCP
   selector:
-    service: elasticsearch
+    esapp: elasticsearch
 ---
 # elasticsearch-statefulset.yaml
 apiVersion: apps/v1
@@ -60,13 +60,13 @@ metadata:
   name: elasticsearch
   namespace: myspace
   labels:
-    service: elasticsearch
+    esapp: elasticsearch
 spec:
   replicas: 3
   serviceName: es-headless
   selector:
     matchLabels:
-      service: elasticsearch
+      esapp: elasticsearch
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -79,7 +79,7 @@ spec:
   template:
     metadata:
       labels:
-        service: elasticsearch
+        esapp: elasticsearch
     spec:
       terminationGracePeriodSeconds: 300
       affinity:
@@ -99,7 +99,7 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
-              - key: service
+              - key: esapp
                 operator: In
                 values:
                 - es-headless

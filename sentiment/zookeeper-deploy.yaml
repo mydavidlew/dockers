@@ -162,10 +162,10 @@ spec:
           limits:
             memory: 2Gi
         env:
-        - name: ALLOW_ANONYMOUS_LOGIN
-          value: "yes"
 #       - name: ZOO_SERVER_ID
 #         value: "1"
+        - name: ALLOW_ANONYMOUS_LOGIN
+          value: "yes"
         - name: ZOO_TICK_TIME
           valueFrom:
             configMapKeyRef:
