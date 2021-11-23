@@ -19,6 +19,7 @@ metadata:
   namespace: myspace
   labels:
     zkapp: nifi-service
+    io.portainer.kubernetes.application.stack: sentiment
 spec:
   type: LoadBalancer
   ports:
@@ -45,6 +46,7 @@ metadata:
   namespace: myspace
   labels:
     zkapp: nifi
+    io.portainer.kubernetes.application.stack: sentiment
 spec:
   replicas: 3
   selector:
