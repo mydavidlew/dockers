@@ -111,7 +111,7 @@ if [[ $# -eq 1 && $1 == $C_START ]] ; then
   echo "$(date) $line $$: 5 Create the 'myspace' Namespace..."
   kubectl create namespace myspace
   kubectl config set-context --current --namespace=myspace
-  set_StorageClass # create a local storage
+  set_StorageClass # create a local storage - https://docs.portainer.io/v/ce-2.9/start/install/agent/docker/linux
   sleep $SLEEP_INT; echo
   #
   # Display the cluster information. Execute following command:
