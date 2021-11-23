@@ -39,6 +39,7 @@ metadata:
   namespace: myspace
   labels:
     esapp: es-headless
+    io.portainer.kubernetes.application.stack: sentiment
 spec:
   clusterIP: None # Setting the clusterIP field in a service spec to 'None' makes the service headless.
   ports:
@@ -61,6 +62,7 @@ metadata:
   namespace: myspace
   labels:
     esapp: elasticsearch
+    io.portainer.kubernetes.application.stack: sentiment
 spec:
   replicas: 3
   serviceName: es-headless
