@@ -36,6 +36,7 @@ metadata:
   namespace: myspace
   labels:
     zkapp: zk-headless
+    io.portainer.kubernetes.application.stack: sentiment
 spec:
   clusterIP: None # Setting the clusterIP field in a service spec to 'None' makes the service headless.
   ports:
@@ -75,6 +76,7 @@ metadata:
   namespace: myspace
   labels:
     zkapp: zookeeper
+    io.portainer.kubernetes.application.stack: sentiment
 spec:
   replicas: 2
   serviceName: zk-headless
