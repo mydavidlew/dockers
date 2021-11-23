@@ -35,7 +35,7 @@ spec:
             echo -en '\nMY_NODE_NAME     = $MY_NODE_NAME';
             echo -en '\nMY_NODE_IP       = $MY_NODE_IP';
             echo -en '\nMY_POD_NAMESPACE = $MY_POD_NAMESPACE';
-            sleep 1;
+            sleep 5;
           done;
         env:
         - name: MY_POD_NAME
