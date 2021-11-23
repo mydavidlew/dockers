@@ -81,27 +81,27 @@ spec:
     spec:
       terminationGracePeriodSeconds: 300
       affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: px/running
-                operator: NotIn
-                values:
-                - "false"
-              - key: px/enabled
-                operator: NotIn
-                values:
-                - "false"
+        # nodeAffinity:
+        #   requiredDuringSchedulingIgnoredDuringExecution:
+        #     nodeSelectorTerms:
+        #     - matchExpressions:
+        #       - key: px/running
+        #         operator: NotIn
+        #         values:
+        #         - "false"
+        #       - key: px/enabled
+        #         operator: NotIn
+        #         values:
+        #         - "false"
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: "kaapp"
-                    operator: In
-                    values: 
-                    - ka-headless
-              topologyKey: "kubernetes.io/hostname"
+          - labelSelector:
+              matchExpressions:
+              - key: "kaapp"
+                operator: In
+                values: 
+                - kafka
+            topologyKey: "kubernetes.io/hostname"
       containers:
       - name: kafka
         image: bitnami/kafka:latest
