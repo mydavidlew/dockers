@@ -59,7 +59,7 @@ metadata:
   name: kafka
   namespace: myspace
   labels:
-    kaapp: kafka
+    kaapp: ka-stateful
     io.portainer.kubernetes.application.stack: sentiment
 spec:
   replicas: 3

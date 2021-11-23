@@ -18,7 +18,7 @@ metadata:
   name: nifi-service
   namespace: myspace
   labels:
-    zkapp: nifi-service
+    my.app.nifi: nifi-service
     io.portainer.kubernetes.application.stack: sentiment
 spec:
   type: LoadBalancer
@@ -45,7 +45,7 @@ metadata:
   name: nifi
   namespace: myspace
   labels:
-    zkapp: nifi
+    my.app.nifi: nifi-stateless
     io.portainer.kubernetes.application.stack: sentiment
 spec:
   replicas: 3
@@ -57,7 +57,7 @@ spec:
       labels:
         my.app.nifi: nifi
     spec:
-      dnsPolicy: ClusterFirstWithHostNet
+    # dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: nifi
           image: apache/nifi:latest

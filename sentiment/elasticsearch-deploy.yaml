@@ -61,7 +61,7 @@ metadata:
   name: elasticsearch
   namespace: myspace
   labels:
-    esapp: elasticsearch
+    esapp: es-stateful
     io.portainer.kubernetes.application.stack: sentiment
 spec:
   replicas: 3

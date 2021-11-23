@@ -1,41 +1,138 @@
+# [[[Deploying Redis on Kubernetes]]]
+# Redis node discovery through Headless Service & Redis cluster using StatefulSet
+# https://redis.io/topics/cluster-tutorial
+# https://github.com/bitnami/bitnami-docker-redis
+# https://github.com/bitnami/bitnami-docker-redis-cluster
+# https://tech.ringieraxelspringer.com/blog/cloud/how-to-create-a-primary-replica-redis-cluster-in-kubernetes/r8lt028
+#
+# Setting up replication
+# A replication cluster can easily be setup with the Bitnami Redis(TM) Docker Image using the following environment variables:
+#    REDIS_REPLICATION_MODE: The replication mode. Possible values master/slave. No defaults.
+#    REDIS_REPLICA_IP: The replication announce ip. Defaults to $(get_machine_ip) which return the ip of the container.
+#    REDIS_REPLICA_PORT: The replication announce port. Defaults to REDIS_MASTER_PORT_NUMBER.
+#    REDIS_MASTER_HOST: Hostname/IP of replication master (replica node parameter). No defaults.
+#    REDIS_MASTER_PORT_NUMBER: Server port of the replication master (replica node parameter). Defaults to 6379.
+#    REDIS_MASTER_PASSWORD: Password to authenticate with the master (replica node parameter). No defaults. As an alternative, you can mount a file with the password and set the REDIS_MASTER_PASSWORD_FILE variable.
+#
+# <cmd> kubectl apply -f redis-deploy.yaml
+# <cmd> kubectl port-forward -n myspace statefulset/redis 2181:2181
+# <cmd> kubectl exec -i -t deploy/busybox -- nslookup redis-service
+#       Server:    10.96.0.10
+#       Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+#       Name:      zk-headless
+#       Address 1: 10.244.1.8 zookeeper-0.zk-headless.myspace.svc.cluster.local
+#       Address 2: 10.244.3.9 zookeeper-1.zk-headless.myspace.svc.cluster.local
+#
+# <cmd> for i in 0 1 2; do echo "myid redis-$i";kubectl exec redis-$i -- cat /bitnami/zookeeper/data/myid; done
+# <cmd> for i in 0 1 2; do kubectl exec redis-$i -- hostname -f; done
+# <cmd> kubectl exec zookeeper-0 -- cat /opt/bitnami/redis/conf/zoo.cfg
+# <cmd> for i in 0 1 2; do kubectl get pod redis-$i --template {{.spec.nodeName}}; echo ""; done
+#
+# redis-storage.yaml
+# apiVersion: storage.k8s.io/v1
+# kind: StorageClass
+# metadata:
+#   name: local-storage
+# provisioner: rancher.io/local-path
+# volumeBindingMode: WaitForFirstConsumer
+# ---
+# Redis Service
 apiVersion: v1
 kind: Service
 metadata:
-  name: redis
+  name: redis-service
+  namespace: myspace
   labels:
-    app: redis
+    my.app.redis: redis-service
+    io.portainer.kubernetes.application.stack: sentiment
 spec:
   ports:
-  - port: 6379
-    name: redis
+  - name: server
+    protocol: TCP
     targetPort: 6379
+    port: 6379
   selector:
-    app: redis
+    my.app.redis: redis
 ---
+# Local persistent volume claim (currently just local path)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc
+  namespace: myspace
+spec:
+  storageClassName: local-storage
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: 1Gi
+---
+# Redis Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: redis
+  namespace: myspace
+  labels:
+    my.app.redis: redis-stateless
+    io.portainer.kubernetes.application.stack: sentiment
 spec:
+  replicas: 3
   selector:
     matchLabels:
-      app: redis
-  replicas: 3
+      my.app.redis: redis
   template:
     metadata:
       labels:
-        app: redis
+        my.app.redis: redis
     spec:
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
-              - key: app
+              - key: my.app.redis
                 operator: In
                 values:
                 - redis
             topologyKey: "kubernetes.io/hostname"
       containers:
       - name: redis-server
-        image: redis:3.2-alpine
+        image: bitnami/redis:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 6379
+          name: server
+        resources:
+          requests:
+            memory: ".5Gi"
+          limits:
+            memory: ".5Gi"
+        env:
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: MY_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: MY_NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: REDIS_REPLICATION_MODE
+          value: "master"
+        - name: REDIS_PASSWORD
+          value: "my_master_password"
+        volumeMounts:
+        - name: data
+          mountPath: /bitnami/redis
+      volumes:
+      - name: data
+        persistentVolumeClaim: 
+          claimName: redis-pvc

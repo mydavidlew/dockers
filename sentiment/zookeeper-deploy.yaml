@@ -75,7 +75,7 @@ metadata:
   name: zookeeper
   namespace: myspace
   labels:
-    zkapp: zookeeper
+    zkapp: zk-stateful
     io.portainer.kubernetes.application.stack: sentiment
 spec:
   replicas: 2
