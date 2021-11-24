@@ -155,7 +155,7 @@ elif [[ $# -eq 2 && $1 == $C_START && $2 == $APP_PORTAINER ]] ; then
   # To expose via Load Balancer, this command will provision Portainer at an assigned Load Balancer IP on port 9000 for HTTP [http://<loadbalancer_IP>:9000/] and 9443 for HTTPS [https://<loadbalancer_IP>:9443/]:
   ###kubectl apply -n portainer -f https://raw.githubusercontent.com/portainer/k8s/master/deploy/manifests/portainer/portainer-lb.yaml
   kubectl apply -f kubernetes/portainer-config.yaml
-  sleep $SLEEP_INT; echo
+  sleep $SLEEP_INT; echo # create a linux portainer agent - https://docs.portainer.io/v/ce-2.9/start/install/agent/docker/linux
   #
   # To explicitly set the target node when deploying using YAML manifests, run the following one-liner to "patch" the deployment, forcing the pod to always be scheduled on the node it's currently running on:
   # ---No need to run this patch---
