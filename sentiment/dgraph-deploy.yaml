@@ -1,8 +1,8 @@
-
+# [[[Deploying Dgraph on Kubernetes]]]
+# Dgraph node discovery through Headless Service & Dgraph cluster using StatefulSet
 # https://dgraph.io/docs/deploy/kubernetes/
 # https://github.com/dgraph-io/dgraph/blob/master/contrib/config/kubernetes/dgraph-ha/dgraph-ha.yaml
-
-
+#
 # This highly available config creates 3 Dgraph Zeros and 3 Dgraph Alphas with 3
 # replicas. The Dgraph cluster will still be available to service requests even
 # when one Zero and/or one Alpha are down.
@@ -10,14 +10,22 @@
 # There are 3 services can can be used to expose outside the cluster as needed:
 #       dgraph-zero-public - To load data using Live & Bulk Loaders
 #       dgraph-alpha-public - To connect clients and for HTTP APIs
-
+#
+# <cmd> kubectl apply -f dgraph-deploy.yaml
+# <cmd> kubectl port-forward service/dgraph-zero-public 6080:6080
+# <cmd> kubectl port-forward service/dgraph-alpha-public 8080:8080
+# <cmd> kubectl exec deploy/busybox -- nslookup dgraph-zero-public
+# <cmd> kubectl exec deploy/busybox -- nslookup dgraph-alpha-public
+#
 apiVersion: v1
 kind: Service
 metadata:
   name: dgraph-zero-public
+  namespace: myspace
   labels:
     app: dgraph-zero
     monitor: zero-dgraph-io
+    io.portainer.kubernetes.application.stack: sentiment
 spec:
   type: ClusterIP
   ports:
@@ -34,9 +42,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: dgraph-alpha-public
+  namespace: myspace
   labels:
     app: dgraph-alpha
     monitor: alpha-dgraph-io
+    io.portainer.kubernetes.application.stack: sentiment
 spec:
   type: ClusterIP
   ports:
@@ -55,8 +65,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: dgraph-zero
+  namespace: myspace
   labels:
     app: dgraph-zero
+    io.portainer.kubernetes.application.stack: sentiment
 spec:
   ports:
   - port: 5080
@@ -76,8 +88,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: dgraph-alpha
+  namespace: myspace
   labels:
     app: dgraph-alpha
+    io.portainer.kubernetes.application.stack: sentiment
 spec:
   ports:
   - port: 7080
@@ -96,9 +110,10 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: dgraph-zero
+  namespace: myspace
 spec:
   serviceName: "dgraph-zero"
-  replicas: 3
+  replicas: 1 # 3
   selector:
     matchLabels:
       app: dgraph-zero
@@ -147,7 +162,7 @@ spec:
             if [[ $ordinal -eq 0 ]]; then
               exec dgraph zero --my=$(hostname -f):5080 --raft="idx=$idx" --replicas 3
             else
-              exec dgraph zero --my=$(hostname -f):5080 --peer dgraph-zero-0.dgraph-zero.${POD_NAMESPACE}:5080 --raft="idx=$idx" --replicas 3
+              exec dgraph zero --my=$(hostname -f):5080 --peer dgraph-zero-0.dgraph-zero.${POD_NAMESPACE}.svc.cluster.local:5080 --raft="idx=$idx" --replicas 3
             fi
         livenessProbe:
           httpGet:
@@ -191,9 +206,10 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: dgraph-alpha
+  namespace: myspace
 spec:
   serviceName: "dgraph-alpha"
-  replicas: 3
+  replicas: 1 # 3
   selector:
     matchLabels:
       app: dgraph-alpha
@@ -288,7 +304,8 @@ spec:
           - "-c"
           - |
             set -ex
-            dgraph alpha --my=$(hostname -f):7080 --zero dgraph-zero-0.dgraph-zero.${POD_NAMESPACE}:5080,dgraph-zero-1.dgraph-zero.${POD_NAMESPACE}:5080,dgraph-zero-2.dgraph-zero.${POD_NAMESPACE}:5080
+            dgraph alpha --my=$(hostname -f):7080 --zero dgraph-zero-0.dgraph-zero.${POD_NAMESPACE}.svc.cluster.local:5080
+            echo # dgraph alpha --my=$(hostname -f):7080 --zero dgraph-zero-0.dgraph-zero.${POD_NAMESPACE}.svc.cluster.local:5080,dgraph-zero-1.dgraph-zero.${POD_NAMESPACE}.svc.cluster.local:5080,dgraph-zero-2.dgraph-zero.${POD_NAMESPACE}.svc.cluster.local:5080
         livenessProbe:
           httpGet:
             path: /health?live=1
