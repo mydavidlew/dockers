@@ -15,18 +15,18 @@
 #    REDIS_MASTER_PASSWORD: Password to authenticate with the master (replica node parameter). No defaults. As an alternative, you can mount a file with the password and set the REDIS_MASTER_PASSWORD_FILE variable.
 #
 # <cmd> kubectl apply -f redis-deploy.yaml
-# <cmd> kubectl port-forward -n myspace statefulset/redis 2181:2181
-# <cmd> kubectl exec -i -t deploy/busybox -- nslookup redis-service
+# <cmd> kubectl port-forward -n myspace deploy/redis-master 6379:6379
+# <cmd> kubectl exec deploy/busybox -- nslookup redis-master-service
 #       Server:    10.96.0.10
 #       Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
-#       Name:      zk-headless
-#       Address 1: 10.244.1.8 zookeeper-0.zk-headless.myspace.svc.cluster.local
-#       Address 2: 10.244.3.9 zookeeper-1.zk-headless.myspace.svc.cluster.local
-#
-# <cmd> for i in 0 1 2; do echo "myid redis-$i";kubectl exec redis-$i -- cat /bitnami/zookeeper/data/myid; done
-# <cmd> for i in 0 1 2; do kubectl exec redis-$i -- hostname -f; done
-# <cmd> kubectl exec zookeeper-0 -- cat /opt/bitnami/redis/conf/zoo.cfg
-# <cmd> for i in 0 1 2; do kubectl get pod redis-$i --template {{.spec.nodeName}}; echo ""; done
+#       Name:      redis-master-service
+#       Address 1: 10.106.151.46 redis-master-service.myspace.svc.cluster.local
+# <cmd> kubectl port-forward -n myspace deploy/redis-replica 6379:6379
+# <cmd> kubectl exec deploy/busybox -- nslookup redis-replica-service
+#       Server:    10.96.0.10
+#       Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+#       Name:      redis-replica-service
+#       Address 1: 10.107.178.243 redis-replica-service.myspace.svc.cluster.local
 #
 # redis-storage.yaml
 # apiVersion: storage.k8s.io/v1
@@ -36,29 +36,49 @@
 # provisioner: rancher.io/local-path
 # volumeBindingMode: WaitForFirstConsumer
 # ---
-# Redis Service
+# Redis Master Service
 apiVersion: v1
 kind: Service
 metadata:
-  name: redis-service
+  name: redis-master-service
   namespace: myspace
   labels:
-    my.app.redis: redis-service
+    my.app.redis: redis-master-service
     io.portainer.kubernetes.application.stack: sentiment
 spec:
+  type: ClusterIP # LoadBalancer or ClusterIP, use NodePort if you are not running Kubernetes on Cloud
   ports:
   - name: server
     protocol: TCP
     targetPort: 6379
     port: 6379
   selector:
-    my.app.redis: redis
+    my.app.redis: redis-master
+---
+# Redis Replica Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-replica-service
+  namespace: myspace
+  labels:
+    my.app.redis: redis-replica-service
+    io.portainer.kubernetes.application.stack: sentiment
+spec:
+  type: ClusterIP # LoadBalancer or ClusterIP, use NodePort if you are not running Kubernetes on Cloud
+  ports:
+  - name: server
+    protocol: TCP
+    targetPort: 6379
+    port: 6379
+  selector:
+    my.app.redis: redis-replica
 ---
 # Local persistent volume claim (currently just local path)
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: redis-pvc
+  name: redis-master-pvc
   namespace: myspace
 spec:
   storageClassName: local-storage
@@ -67,24 +87,37 @@ spec:
     requests:
       storage: 1Gi
 ---
-# Redis Deployment
+# Local persistent volume claim (currently just local path)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-replica-pvc
+  namespace: myspace
+spec:
+  storageClassName: local-storage
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: 1Gi
+---
+# Redis Master Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: redis
+  name: redis-master
   namespace: myspace
   labels:
     my.app.redis: redis-stateless
     io.portainer.kubernetes.application.stack: sentiment
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
-      my.app.redis: redis
+      my.app.redis: redis-master
   template:
     metadata:
       labels:
-        my.app.redis: redis
+        my.app.redis: redis-master
     spec:
       affinity:
         podAntiAffinity:
@@ -94,10 +127,11 @@ spec:
               - key: my.app.redis
                 operator: In
                 values:
-                - redis
+                - redis-stateless
             topologyKey: "kubernetes.io/hostname"
+      subdomain: primary
       containers:
-      - name: redis-server
+      - name: redis-master
         image: bitnami/redis:latest
         imagePullPolicy: IfNotPresent
         ports:
@@ -135,4 +169,81 @@ spec:
       volumes:
       - name: data
         persistentVolumeClaim: 
-          claimName: redis-pvc
+          claimName: redis-master-pvc
+---
+# Redis Replica Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-replica
+  namespace: myspace
+  labels:
+    my.app.redis: redis-stateless
+    io.portainer.kubernetes.application.stack: sentiment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      my.app.redis: redis-replica
+  template:
+    metadata:
+      labels:
+        my.app.redis: redis-replica
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: my.app.redis
+                operator: In
+                values:
+                - redis-stateless
+            topologyKey: "kubernetes.io/hostname"
+      subdomain: replica
+      containers:
+      - name: redis-replica
+        image: bitnami/redis:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 6379
+          name: server
+        resources:
+          requests:
+            memory: ".5Gi"
+          limits:
+            memory: ".5Gi"
+        env:
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: MY_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: MY_NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: REDIS_REPLICATION_MODE
+          value: "slave"
+        - name: REDIS_MASTER_HOST
+          value: "redis-master-service.myspace.svc.cluster.local"
+        - name: REDIS_MASTER_PORT_NUMBER
+          value: "6379"
+        - name: REDIS_MASTER_PASSWORD
+          value: "my_master_password"
+        - name: REDIS_PASSWORD
+          value: "my_replica_password"
+        volumeMounts:
+        - name: data
+          mountPath: /bitnami/redis
+      volumes:
+      - name: data
+        persistentVolumeClaim: 
+          claimName: redis-replica-pvc
