@@ -17,6 +17,8 @@ services:
         container_name: alfresco
         restart: unless-stopped
         mem_limit: 1700m
+        labels:
+            - "io.portainer.kubernetes.application.stack=alfresco"
         environment:
             SERVICE_PRECONDITION: "activemq:8161 solr6:8983"
             JAVA_OPTS: "
@@ -91,6 +93,8 @@ services:
         container_name: share
         restart: unless-stopped
         mem_limit: 1g
+        labels:
+            - "io.portainer.kubernetes.application.stack=alfresco"
         environment:
             SERVICE_PRECONDITION: "activemq:8161 solr6:8983 alfresco:8080"
             REPO_HOST: "alfresco"
@@ -125,6 +129,8 @@ services:
         container_name: solr6
         restart: unless-stopped
         mem_limit: 2g
+        labels:
+            - "io.portainer.kubernetes.application.stack=alfresco"
         environment:
             #Solr needs to know how to register itself with Alfresco
             - SOLR_ALFRESCO_HOST=alfresco
@@ -148,6 +154,8 @@ services:
         container_name: activemq
         restart: unless-stopped
         mem_limit: 1g
+        labels:
+            - "io.portainer.kubernetes.application.stack=alfresco"
         networks:
             - networks1
         ports:
@@ -204,4 +212,3 @@ networks:
     networks1:
         external:
             name: appnet
-
