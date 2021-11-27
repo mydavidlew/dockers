@@ -1,6 +1,4 @@
 Kubernetes for Docker
-https://download.docker.com/linux/ubuntu/dists/
-https://docs.docker.com/engine/install/
 
 [[[Install kubectl on Linux]]]
 A) Install kubectl binary with curl on Linux
