@@ -36,6 +36,7 @@ Docker-postgresql
 >> docker stop postgres1
 >>
 >> #sudo -u postgres psql -h localhost postgres
+>> docker exec -it postgres1 psql -U postgres -W
 >> ALTER USER postgres PASSWORD 'password';
 >> CREATE USER test WITH ENCRYPTED PASSWORD 'password';
 >> GRANT ALL PRIVILEGES ON DATABASE postgres TO test WITH GRANT OPTION;
