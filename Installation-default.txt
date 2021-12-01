@@ -14,7 +14,7 @@ Docker-mysql
 >> docker run --rm --name=mysql1 --network=appnet --env "MYSQL_ROOT_PASSWORD=password" --mount type=bind,src=/opt/docker/mysql/data,dst=/var/lib/mysql -p 3306:3306 -d mysql
 >> docker logs -f mysql1
 >> docker exec -it mysql1 bash
->> docker exec -it mysql1 mysql -uroot -ppassword
+>> docker exec -it mysql1 mysql -h localhost -u root -p
 >> ALTER USER 'root'@'localhost' IDENTIFIED BY 'password';
 >> RENAME USER 'root'@'localhost' TO 'root'@'%';
 >> ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
@@ -36,7 +36,7 @@ Docker-postgresql
 >> docker stop postgres1
 >>
 >> #sudo -u postgres psql -h localhost postgres
->> docker exec -it postgres1 psql -U postgres -W
+>> docker exec -it postgres1 psql -h localhost -U postgres -W
 >> ALTER USER postgres PASSWORD 'password';
 >> CREATE USER test WITH ENCRYPTED PASSWORD 'password';
 >> GRANT ALL PRIVILEGES ON DATABASE postgres TO test WITH GRANT OPTION;
