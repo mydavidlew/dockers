@@ -13,7 +13,7 @@ L_BC1=business-central-workbench; L_KS1=kie-server
 
 SLEEP_INT=1
 D_NETWORK=appnet
-C_START=start; C_STOP=stop; C_RUN=run; C_REMOVE=rm; C_INIT=init
+C_START=start; C_STOP=stop; C_RUN=run; C_REMOVE=rm; C_INIT=init; C_INITX=initx
 C_DOCKER01="docker $C_RUN --rm -d"
 C_DOCKER02="docker $C_RUN -d"
 C_DOCKER=$C_DOCKER02
@@ -27,7 +27,7 @@ LABEL_DE="io.portainer.kubernetes.application.stack=rulengine"
 LABEL_PA="io.portainer.kubernetes.application.stack=portainer"
 
 function check_command() {
-  if [[ $1 == $C_START || $1 == $C_STOP || $1 == $C_RUN || $1 == $C_REMOVE || $1 == $C_INIT ]] ; then
+  if [[ $1 == $C_START || $1 == $C_STOP || $1 == $C_RUN || $1 == $C_REMOVE || $1 == $C_INIT || $1 == $C_INITX ]] ; then
     echo "$(date) $line $$: valid docker $1 command found"
     C_COMMAND=$1
     if [[ $1 == $C_INIT ]] ; then
@@ -64,7 +64,7 @@ function get_netstat() {
   fi
 }
 
-if [[ $# -eq 2 && ($1 == $C_RUN || $1 == $C_INIT) && $2 == $APP_DS ]] ; then
+if [[ $# -eq 2 && ($1 == $C_RUN || $1 == $C_INIT || $1 == $C_INITX) && $2 == $APP_DS ]] ; then
   check_network
   check_command $1
   echo "$(date) $line $$: $C_COMMAND all datastore services"
@@ -74,55 +74,64 @@ if [[ $# -eq 2 && ($1 == $C_RUN || $1 == $C_INIT) && $2 == $APP_DS ]] ; then
     $C_DOCKER --hostname=$D_MG1.local --name=$D_MG1 --network=$D_NETWORK --label=$LABEL_DS --env "MONGO_INITDB_ROOT_USERNAME=root" --env "MONGO_INITDB_ROOT_PASSWORD=password" -p 27017:27017 mongo:latest
     $C_DOCKER --hostname=$D_RD1.local --name=$D_RD1 --network=$D_NETWORK --label=$LABEL_DS -p 6379:6379 redis:latest
     $C_DOCKER --hostname=$D_SL1.local --name=$D_SL1 --network=$D_NETWORK --label=$LABEL_DS -p 8983:8983 solr:latest
-    sleep $SLEEP_INT; sleep $SLEEP_INT; sleep $SLEEP_INT; sleep $SLEEP_INT; sleep $SLEEP_INT
-    ### $C_MOUNT,src=$L_PATH"/mysql/data",dst=/var/lib/mysql --- sudo chown 999:999 -R mysql/data
+    sleep $SLEEP_INT
+  elif [[ $1 == $C_INITX ]] ; then
+    ### MOUNT,src=$L_PATH"/mysql/data",dst=/var/lib/mysql --- sudo chown 999:999 -R mysql/data
+    # docker exec -it mysql1 mysql -h localhost -u root -p
     docker exec -w /var/lib/mysql $D_MY1 bash -c 'tar -zcvf /tmp/mysql-data.tgz *'
     docker cp $D_MY1:/tmp/mysql-data.tgz mysql/
     if [ -d "mysql/data" ] ; then
       sudo rm -rf mysql/data/*
+    else
+      mkdir mysql/data; sudo chown 999:999 -R mysql/data 
     fi
     sudo tar --same-owner -zxvf mysql/mysql-data.tgz --directory mysql/data
-    ### $C_MOUNT,src=$L_PATH"/postgres/data",dst=/var/lib/postgresql/data --- sudo chown 999:999 -R postgres/data
+    ### MOUNT,src=$L_PATH"/postgres/data",dst=/var/lib/postgresql/data --- sudo chown 999:999 -R postgres/data
+    # docker exec -it postgres1 psql -h localhost -U postgres -W
     docker exec -w /var/lib/postgresql/data $D_PG1 bash -c 'tar -zcvf /tmp/psql-data.tgz *'
     docker cp $D_PG1:/tmp/psql-data.tgz postgres/
     if [ -d "postgres/data" ] ; then
       sudo rm -rf postgres/data/*
+    else
+      mkdir postgres/data; sudo chown 999:999 -R postgres/data 
     fi
     sudo tar --same-owner -zxvf postgres/psql-data.tgz --directory postgres/data
-    ### $C_MOUNT,src=$L_PATH"/mongo/data",dst=/data/db --- sudo chown 999:999 -R mongo/data
+    ### MOUNT,src=$L_PATH"/mongo/data",dst=/data/db --- sudo chown 999:999 -R mongo/data
     docker exec -w /data/db $D_MG1 bash -c 'tar -zcvf /tmp/mongo-data.tgz *'
     docker cp $D_MG1:/tmp/mongo-data.tgz mongo/
     if [ -d "mongo/data" ] ; then
       sudo rm -rf mongo/data/*
+    else
+      mkdir mongo/data; sudo chown 999:999 -R mongo/data 
     fi
     sudo tar --same-owner -zxvf mongo/mongo-data.tgz --directory mongo/data
-    ### $C_MOUNT,src=$L_PATH"/redis/data",dst=/data --- sudo chown 999:999 -R redis/data
+    ### MOUNT,src=$L_PATH"/redis/data",dst=/data --- sudo chown 999:999 -R redis/data
     docker exec -w /data $D_RD1 bash -c 'tar -zcvf /tmp/redis-data.tgz *'
     docker cp $D_RD1:/tmp/redis-data.tgz redis/
     if [ -d "redis/data" ] ; then
       sudo rm -rf redis/data/*
+    else
+      mkdir redis/data; sudo chown 999:999 -R redis/data 
     fi
     sudo tar --same-owner -zxvf redis/redis-data.tgz --directory redis/data
-    ### $C_MOUNT,src=$L_PATH"/solr/data",dst=/var/solr/data --- sudo chown 8983:8983 -R solr/data
+    ### MOUNT,src=$L_PATH"/solr/data",dst=/var/solr/data --- sudo chown 8983:8983 -R solr/data
     docker exec -w /var/solr/data $D_SL1 bash -c 'tar -zcvf /tmp/solr-data.tgz *'
     docker cp $D_SL1:/tmp/solr-data.tgz solr/
     if [ -d "solr/data" ] ; then
       sudo rm -rf solr/data/*
+    else
+      mkdir solr/data; sudo chown 8983:8983 -R solr/data 
     fi
     sudo tar --same-owner -zxvf solr/solr-data.tgz --directory solr/data
   else
     $C_DOCKER --hostname=$D_MY1.local --name=$D_MY1 --network=$D_NETWORK --label=$LABEL_DS --env "MYSQL_ROOT_PASSWORD=password" $C_MOUNT,src=$L_PATH"/mysql/data",dst=/var/lib/mysql -p 3306:3306 mysql:latest
     get_netstat $C_COMMAND $D_MY1
-    sleep $SLEEP_INT
     $C_DOCKER --hostname=$D_PG1.local --name=$D_PG1 --network=$D_NETWORK --label=$LABEL_DS --env "POSTGRES_PASSWORD=password" $C_MOUNT,src=$L_PATH"/postgres/data",dst=/var/lib/postgresql/data -p 5432:5432 postgres:latest
     get_netstat $C_COMMAND $D_PG1
-    sleep $SLEEP_INT
     $C_DOCKER --hostname=$D_MG1.local --name=$D_MG1 --network=$D_NETWORK --label=$LABEL_DS --env "MONGO_INITDB_ROOT_USERNAME=root" --env "MONGO_INITDB_ROOT_PASSWORD=password" $C_MOUNT,src=$L_PATH"/mongo/data",dst=/data/db -p 27017:27017 mongo:latest
     get_netstat $C_COMMAND $D_MG1
-    sleep $SLEEP_INT
     $C_DOCKER --hostname=$D_RD1.local --name=$D_RD1 --network=$D_NETWORK --label=$LABEL_DS $C_MOUNT,src=$L_PATH"/redis/data",dst=/data -p 6379:6379 redis:latest
     get_netstat $C_COMMAND $D_RD1
-    sleep $SLEEP_INT
     $C_DOCKER --hostname=$D_SL1.local --name=$D_SL1 --network=$D_NETWORK --label=$LABEL_DS $C_MOUNT,src=$L_PATH"/solr/data",dst=/var/solr/data -p 8983:8983 solr:latest
     get_netstat $C_COMMAND $D_SL1
     sleep $SLEEP_INT
@@ -286,7 +295,7 @@ elif [[ $# -eq 2 && $1 != $C_RUN && $2 == $APP_XX ]] ; then
   get_netstat $C_COMMAND $D_XX1
   sleep $SLEEP_INT
 else
-  echo "$(date) $line $$: Wrong party! pls use '$0 <$C_START/$C_STOP/$C_RUN/$C_REMOVE/$C_INIT> <$APP_DS/$APP_MA/$APP_MS/$APP_ES/$APP_EB/$APP_DE/$APP_PA>'"
+  echo "$(date) $line $$: Wrong party! pls use '$0 <$C_START/$C_STOP/$C_RUN/$C_REMOVE/$C_INIT(x)> <$APP_DS/$APP_MA/$APP_MS/$APP_ES/$APP_EB/$APP_DE/$APP_PA>'"
 fi
 # show the docker containers and systems
 check_docker
