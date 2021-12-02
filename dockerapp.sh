@@ -153,10 +153,8 @@ elif [[ $# -eq 2 && $1 == $C_RUN && $2 == $APP_MA ]] ; then
   echo "$(date) $line $$: $C_COMMAND all monitor agent services"
   $C_DOCKER --hostname=$D_CE1.local --name=$D_CE1 --network=$D_NETWORK --label=$LABEL_MS $C_MOUNT,src=/var/run/docker.sock,dst=/var/run/docker.sock -p 9104:9104 prom/container-exporter
   get_netstat $C_COMMAND $D_CE1
-  sleep $SLEEP_INT
   $C_DOCKER --hostname=$D_NE1.local --name=$D_NE1 --network=$D_NETWORK --label=$LABEL_MS -p 9100:9100 prom/node-exporter
   get_netstat $C_COMMAND $D_NE1
-  sleep $SLEEP_INT
   $C_DOCKER --hostname=$D_CA1.local --name=$D_CA1 --network=$D_NETWORK --label=$LABEL_MS $C_MOUNT,src=/,dst=/rootfs $C_MOUNT,src=/var/run,dst=/var/run $C_MOUNT,src=/sys,dst=/sys $C_MOUNT,src=/var/lib/docker/,dst=/var/lib/docker -p 9109:8080 google/cadvisor
   get_netstat $C_COMMAND $D_CA1
   sleep $SLEEP_INT
@@ -175,10 +173,8 @@ elif [[ $# -eq 2 && $1 == $C_RUN && $2 == $APP_MS ]] ; then
   echo "$(date) $line $$: $C_COMMAND all monitor server services"
   $C_DOCKER --hostname=$D_AM1.local --name=$D_AM1 --network=$D_NETWORK --label=$LABEL_MS $C_MOUNT,src=$L_PATH"/alertmanager/etc/alertmanager.yml",dst=/etc/alertmanager/alertmanager.yml -p 9093:9093 prom/alertmanager --config.file=/etc/alertmanager/alertmanager.yml
   get_netstat $C_COMMAND $D_AM1
-  sleep $SLEEP_INT
   $C_DOCKER --hostname=$D_PR1.local --name=$D_PR1 --network=$D_NETWORK --label=$LABEL_MS $C_MOUNT,src=$L_PATH"/prometheus/etc/prometheus.yml",dst=/etc/prometheus/prometheus.yml $C_MOUNT,src=$L_PATH"/prometheus/etc/alert_rules.yml",dst=/etc/prometheus/alert_rules.yml -p 9090:9090 prom/prometheus
   get_netstat $C_COMMAND $D_PR1
-  sleep $SLEEP_INT
   $C_DOCKER --hostname=$D_GR1.local --name=$D_GR1 --network=$D_NETWORK --label=$LABEL_MS $C_MOUNT,src=$L_PATH"/grafana/conf/grafana.ini",dst=/etc/grafana/grafana.ini $C_MOUNT,src=$L_PATH"/grafana/data",dst=/var/lib/grafana -p 3000:3000 grafana/grafana
   get_netstat $C_COMMAND $D_GR1
   sleep $SLEEP_INT
@@ -197,10 +193,8 @@ elif [[ $# -eq 2 && $1 == $C_RUN && $2 == $APP_ES ]] ; then
   echo "$(date) $line $$: $C_COMMAND all elastic stack services"
   $C_DOCKER --hostname=$D_ES1.local --name=$D_ES1 --network=$D_NETWORK --label=$LABEL_ES $C_MOUNT,src=$L_PATH"/elasticsearch/conf",dst=/usr/share/elasticsearch/config --env "discovery.type=single-node" -p 9200:9200 -p 9300:9300 docker.elastic.co/elasticsearch/elasticsearch:7.12.0
   get_netstat $C_COMMAND $D_ES1
-  sleep $SLEEP_INT
   $C_DOCKER --hostname=$D_KI1.local --name=$D_KI1 --network=$D_NETWORK --label=$LABEL_ES $C_MOUNT,src=$L_PATH"/kibana/conf",dst=/usr/share/kibana/config --link $D_ES1:$L_ES1 -p 5601:5601 docker.elastic.co/kibana/kibana:7.12.0
   get_netstat $C_COMMAND $D_KI1
-  sleep $SLEEP_INT
   $C_DOCKER --hostname=$D_LS1.local --name=$D_LS1 --network=$D_NETWORK --label=$LABEL_ES $C_MOUNT,src=$L_PATH"/logstash/conf",dst=/usr/share/logstash/config $C_MOUNT,src=$L_PATH"/logstash/pipeline",dst=/usr/share/logstash/pipeline --link $D_ES1:$L_ES1 -p 5044:5044 -p 9600:9600 docker.elastic.co/logstash/logstash:7.12.0
   get_netstat $C_COMMAND $D_LS1
   sleep $SLEEP_INT
@@ -219,19 +213,14 @@ elif [[ $# -eq 2 && $1 == $C_RUN && $2 == $APP_EB ]] ; then
   echo "$(date) $line $$: $C_COMMAND all elastic beats services"
   $C_DOCKER --hostname=$D_AB1.local --name=$D_AB1 --network=$D_NETWORK --label=$LABEL_ES $C_MOUNT,src=$L_PATH"/allbeats/conf/auditbeat.yml",dst=/usr/share/auditbeat/auditbeat.yml --cap-add="AUDIT_CONTROL" --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/auditbeat:7.12.0
   get_netstat $C_COMMAND $D_AB1
-  sleep $SLEEP_INT
   $C_DOCKER --hostname=$D_FB1.local --name=$D_FB1 --network=$D_NETWORK --label=$LABEL_ES $C_MOUNT,src=$L_PATH"/allbeats/conf/filebeat.yml",dst=/usr/share/filebeat/filebeat.yml --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/filebeat:7.12.0
   get_netstat $C_COMMAND $D_FB1
-  sleep $SLEEP_INT
   $C_DOCKER --hostname=$D_HB1.local --name=$D_HB1 --network=$D_NETWORK --label=$LABEL_ES $C_MOUNT,src=$L_PATH"/allbeats/conf/heartbeat.yml",dst=/usr/share/heartbeat/heartbeat.yml --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/heartbeat:7.12.0
   get_netstat $C_COMMAND $D_HB1
-  sleep $SLEEP_INT
   $C_DOCKER --hostname=$D_JB1.local --name=$D_JB1 --network=$D_NETWORK --label=$LABEL_ES $C_MOUNT,src=$L_PATH"/allbeats/conf/journalbeat.yml",dst=/usr/share/journalbeat/journalbeat.yml --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/journalbeat:7.12.0
   get_netstat $C_COMMAND $D_JB1
-  sleep $SLEEP_INT
   $C_DOCKER --hostname=$D_MB1.local --name=$D_MB1 --network=$D_NETWORK --label=$LABEL_ES $C_MOUNT,src=$L_PATH"/allbeats/conf/metricbeat.yml",dst=/usr/share/metricbeat/metricbeat.yml --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/metricbeat:7.12.0
   get_netstat $C_COMMAND $D_MB1
-  sleep $SLEEP_INT
   $C_DOCKER --hostname=$D_PB1.local --name=$D_PB1 --network=$D_NETWORK --label=$LABEL_ES $C_MOUNT,src=$L_PATH"/allbeats/conf/packetbeat.yml",dst=/usr/share/packetbeat/packetbeat.yml --cap-add=NET_ADMIN --link $D_ES1:$L_ES1 --link $D_KI1:$L_KI1 --link $D_LS1:$L_LS1 docker.elastic.co/beats/packetbeat:7.12.0
   get_netstat $C_COMMAND $D_PB1
   sleep $SLEEP_INT
@@ -253,7 +242,6 @@ elif [[ $# -eq 2 && $1 == $C_RUN && $2 == $APP_DE ]] ; then
   echo "$(date) $line $$: $C_COMMAND all drools engine services"
   $C_DOCKER --hostname=$D_BC1.local --name=$D_BC1 --network=$D_NETWORK --label=$LABEL_DE --env "KIE_SERVER_PROFILE=standalone-full" --link $D_KS1:$L_KS1 $C_MOUNT,src=$L_PATH"/kie-workbench/conf/mgmt-users.properties",dst=/opt/jboss/wildfly/standalone/configuration/mgmt-users.properties $C_MOUNT,src=$L_PATH"/kie-workbench/conf/mgmt-groups.properties",dst=/opt/jboss/wildfly/standalone/configuration/mgmt-groups.properties $C_MOUNT,src=$L_PATH"/kie-workbench/conf/application-users.properties",dst=/opt/jboss/wildfly/standalone/configuration/application-users.properties $C_MOUNT,src=$L_PATH"/kie-workbench/conf/application-roles.properties",dst=/opt/jboss/wildfly/standalone/configuration/application-roles.properties $C_MOUNT,src=$L_PATH"/kie-workbench/bin/start_business-central-wb.sh",dst=/opt/jboss/wildfly/bin/start_business-central-wb.sh -p 8080:8080 -p 8001:8001 jboss/business-central-workbench:7.29.0.Final
   get_netstat $C_COMMAND $D_BC1
-  sleep $SLEEP_INT
   $C_DOCKER --hostname=$D_KS1.local --name=$D_KS1 --network=$D_NETWORK --label=$LABEL_DE --env "KIE_SERVER_PROFILE=standalone-full" --link $D_BC1:$L_BC1 $C_MOUNT,src=$L_PATH"/kie-server/conf/mgmt-users.properties",dst=/opt/jboss/wildfly/standalone/configuration/mgmt-users.properties $C_MOUNT,src=$L_PATH"/kie-server/conf/mgmt-groups.properties",dst=/opt/jboss/wildfly/standalone/configuration/mgmt-groups.properties $C_MOUNT,src=$L_PATH"/kie-server/conf/application-users.properties",dst=/opt/jboss/wildfly/standalone/configuration/application-users.properties $C_MOUNT,src=$L_PATH"/kie-server/conf/application-roles.properties",dst=/opt/jboss/wildfly/standalone/configuration/application-roles.properties $C_MOUNT,src=$L_PATH"/kie-server/bin/start_kie-wb.sh",dst=/opt/jboss/wildfly/bin/start_kie-wb.sh -p 8081:8080 jboss/kie-server:7.29.0.Final
   get_netstat $C_COMMAND $D_KS1
   sleep $SLEEP_INT
