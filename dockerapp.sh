@@ -80,7 +80,7 @@ if [[ $# -eq 2 && ($1 == $C_RUN || $1 == $C_INIT || $1 == $C_INITX) && $2 == $AP
     # docker exec -it mysql1 mysql -h localhost -u root -p
     docker exec -w /var/lib/mysql $D_MY1 bash -c 'tar -zcvf /tmp/mysql-data.tgz *'
     docker cp $D_MY1:/tmp/mysql-data.tgz mysql/
-    if [ -d "mysql/data" ] ; then
+    if [[ -d "mysql/data" ]] ; then
       sudo rm -rf mysql/data/*
     else
       mkdir mysql/data; sudo chown 999:999 -R mysql/data 
@@ -90,7 +90,7 @@ if [[ $# -eq 2 && ($1 == $C_RUN || $1 == $C_INIT || $1 == $C_INITX) && $2 == $AP
     # docker exec -it postgres1 psql -h localhost -U postgres -W
     docker exec -w /var/lib/postgresql/data $D_PG1 bash -c 'tar -zcvf /tmp/psql-data.tgz *'
     docker cp $D_PG1:/tmp/psql-data.tgz postgres/
-    if [ -d "postgres/data" ] ; then
+    if [[ -d "postgres/data" ]] ; then
       sudo rm -rf postgres/data/*
     else
       mkdir postgres/data; sudo chown 999:999 -R postgres/data 
@@ -99,7 +99,7 @@ if [[ $# -eq 2 && ($1 == $C_RUN || $1 == $C_INIT || $1 == $C_INITX) && $2 == $AP
     ### MOUNT,src=$L_PATH"/mongo/data",dst=/data/db --- sudo chown 999:999 -R mongo/data
     docker exec -w /data/db $D_MG1 bash -c 'tar -zcvf /tmp/mongo-data.tgz *'
     docker cp $D_MG1:/tmp/mongo-data.tgz mongo/
-    if [ -d "mongo/data" ] ; then
+    if [[ -d "mongo/data" ]] ; then
       sudo rm -rf mongo/data/*
     else
       mkdir mongo/data; sudo chown 999:999 -R mongo/data 
@@ -108,7 +108,7 @@ if [[ $# -eq 2 && ($1 == $C_RUN || $1 == $C_INIT || $1 == $C_INITX) && $2 == $AP
     ### MOUNT,src=$L_PATH"/redis/data",dst=/data --- sudo chown 999:999 -R redis/data
     docker exec -w /data $D_RD1 bash -c 'tar -zcvf /tmp/redis-data.tgz *'
     docker cp $D_RD1:/tmp/redis-data.tgz redis/
-    if [ -d "redis/data" ] ; then
+    if [[ -d "redis/data" ]] ; then
       sudo rm -rf redis/data/*
     else
       mkdir redis/data; sudo chown 999:999 -R redis/data 
@@ -117,7 +117,7 @@ if [[ $# -eq 2 && ($1 == $C_RUN || $1 == $C_INIT || $1 == $C_INITX) && $2 == $AP
     ### MOUNT,src=$L_PATH"/solr/data",dst=/var/solr/data --- sudo chown 8983:8983 -R solr/data
     docker exec -w /var/solr/data $D_SL1 bash -c 'tar -zcvf /tmp/solr-data.tgz *'
     docker cp $D_SL1:/tmp/solr-data.tgz solr/
-    if [ -d "solr/data" ] ; then
+    if [[ -d "solr/data" ]] ; then
       sudo rm -rf solr/data/*
     else
       mkdir solr/data; sudo chown 8983:8983 -R solr/data 
