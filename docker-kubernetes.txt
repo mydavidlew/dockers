@@ -95,7 +95,10 @@ Your cgroup driver used by Kubelet must match Docker’s cgroup driver.
 $ docker info | grep -i cgroup
 you will get a Docker cgroup driver. And with the command
 
+Starting from kubeadm 1.13.5 => /etc/systemd/system/kubelet.service.d/10-kubeadm.conf          change-to 
+                                /usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf
 $ sudo cat /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+$ sudo cat /usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf
 the Kubelet configuration. In the column with the flag “–cgroup-driver=” you can see the setting.
 --> Environment="KUBELET_CGROUP_ARGS=--cgroup-driver=systemd"
 
