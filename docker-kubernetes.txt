@@ -115,6 +115,7 @@ KinD or Kubernetes in Docker is a suite of tools for local Kubernetes “cluster
 https://kind.sigs.k8s.io/docs/user/quick-start/#installation
 https://github.com/kubernetes-sigs/kind/releases
 
+$ curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.22.0/kind-linux-amd64
 $ curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.10.0/kind-linux-amd64
 $ curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
 $ sudo install -o root -g root -m 0755 kind /usr/bin/kind
