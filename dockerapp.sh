@@ -12,7 +12,7 @@ L_ES1=elasticsearch; L_KI1=kibana; L_LS1=logstash
 L_BC1=business-central-workbench; L_KS1=kie-server
 
 SLEEP_INT=1
-D_NETWORK=appnet
+D_IFAPPS=docnet0; D_NETAPPS=appnet
 C_START=start; C_STOP=stop; C_RUN=run; C_REMOVE=rm; C_INIT=init; C_INITX=initx
 C_DOCKER01="docker $C_RUN --rm -d"
 C_DOCKER02="docker $C_RUN -d"
@@ -20,6 +20,7 @@ C_DOCKER=$C_DOCKER02
 C_MOUNT="--mount type=bind"
 L_PATH="/opt/docker"
 C_COMMAND="null"
+D_NETWORK=$D_NETAPPS
 LABEL_DS="io.portainer.kubernetes.application.stack=datastore"
 LABEL_MS="io.portainer.kubernetes.application.stack=monitoring"
 LABEL_ES="io.portainer.kubernetes.application.stack=elasticsearch"
@@ -40,12 +41,24 @@ function check_command() {
 }
 
 function check_network() { 
-  if [[ ! "$(docker network ls | grep $D_NETWORK)" ]] ; then
-    echo "$(date) $line $$: creating $D_NETWORK bridge network"
-    docker network create $D_NETWORK
+  if [[ ! "$(docker network ls | grep $D_NETAPPS)" ]] ; then
+    echo "$(date) $line $$: creating $D_NETAPPS bridge network"
+    sudo ip link add $D_IFAPPS type bridge
     sleep $SLEEP_INT
+    docker network create \
+      --driver=bridge \
+      --ipv6=false \
+      --subnet=172.18.0.0/16 \
+      --gateway=172.18.0.1 \
+      --opt com.docker.network.bridge.default_bridge=true \
+      --opt com.docker.network.bridge.enable_icc=true \
+      --opt com.docker.network.bridge.enable_ip_masquerade=true \
+      --opt com.docker.network.bridge.host_binding_ipv4="0.0.0.0" \
+      --opt com.docker.network.bridge.name=$D_IFAPPS \
+      --opt com.docker.network.driver.mtu=1500 \
+      $D_NETAPPS
   else
-    echo "$(date) $line $$: $D_NETWORK bridge network exists"
+    echo "$(date) $line $$: $D_NETAPPS bridge network exists"
   fi
 }
 
