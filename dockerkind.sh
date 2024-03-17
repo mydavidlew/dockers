@@ -32,7 +32,10 @@ function check_network() {
       --opt com.docker.network.bridge.name=$D_IFAPPS \
       --opt com.docker.network.driver.mtu=1500 \
       $D_NETAPPS
-  elif [[ ! "$(docker network ls | grep $D_NETKIND)" ]] ; then
+  else
+    echo "$(date) $line $$: $D_NETAPPS bridge network exists"
+  fi
+  if [[ ! "$(docker network ls | grep $D_NETKIND)" ]] ; then
     echo "$(date) $line $$: creating $D_NETKIND bridge network"
     sudo ip link add $D_IFKIND type bridge
     sleep $SLEEP_INT
@@ -49,7 +52,7 @@ function check_network() {
       --opt com.docker.network.driver.mtu=1500 \
       $D_NETKIND
   else
-    echo "$(date) $line $$: $1 bridge network exists"
+    echo "$(date) $line $$: $D_NETKIND bridge network exists"
   fi
 }
 
@@ -99,8 +102,7 @@ EOF
 }
 
 if [[ $# -eq 1 && $1 == $C_START ]] ; then
-  check_network $D_NETAPPS
-  check_network $D_NETKIND
+  check_network
   check_command $1
   echo "$(date) $line $$: $C_COMMAND all kubernetes services"
   # Once you have docker running you can create a cluster with:
