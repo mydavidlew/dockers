@@ -1,8 +1,9 @@
 #!/bin/bash
 APP_DASHBOARD=dashboard; APP_PORTAINER=portainer; APP_INGRESS=ingress
 C_START=start; C_STOP=stop
+D_IFAPPS=docnet0; D_NETAPPS=appnet
+D_IFKIND=docbri0; D_NETKIND=kind
 C_COMMAND="null"
-D_NETWORK=appnet
 SLEEP_INT=5
 
 function check_command() {
@@ -15,11 +16,40 @@ function check_command() {
 }
 
 function check_network() { 
-  if [[ ! "$(docker network ls | grep $D_NETWORK)" ]] ; then
-    echo "$(date) $line $$: creating $D_NETWORK bridge network"
-    docker network create $D_NETWORK
+  if [[ ! "$(docker network ls | grep $D_NETAPPS)" ]] ; then
+    echo "$(date) $line $$: creating $D_NETAPPS bridge network"
+    sudo ip link add $D_IFAPPS type bridge
+    sleep $SLEEP_INT
+    docker network create \
+      --driver=bridge \
+      --ipv6=false \
+      --subnet=172.18.0.0/16 \
+      --gateway=172.18.0.1 \
+      --opt com.docker.network.bridge.default_bridge=true \
+      --opt com.docker.network.bridge.enable_icc=true \
+      --opt com.docker.network.bridge.enable_ip_masquerade=true \
+      --opt com.docker.network.bridge.host_binding_ipv4="0.0.0.0" \
+      --opt com.docker.network.bridge.name=$D_IFAPPS \
+      --opt com.docker.network.driver.mtu=1500 \
+      $D_NETAPPS
+  elif [[ ! "$(docker network ls | grep $D_NETKIND)" ]] ; then
+    echo "$(date) $line $$: creating $D_NETKIND bridge network"
+    sudo ip link add $D_IFKIND type bridge
+    sleep $SLEEP_INT
+    docker network create \
+      --driver=bridge \
+      --ipv6=false \
+      --subnet=172.19.0.0/16 \
+      --gateway=172.19.0.1 \
+      --opt com.docker.network.bridge.default_bridge=true \
+      --opt com.docker.network.bridge.enable_icc=true \
+      --opt com.docker.network.bridge.enable_ip_masquerade=true \
+      --opt com.docker.network.bridge.host_binding_ipv4="0.0.0.0" \
+      --opt com.docker.network.bridge.name=$D_IFKIND \
+      --opt com.docker.network.driver.mtu=1500 \
+      $D_NETKIND
   else
-    echo "$(date) $line $$: $D_NETWORK bridge network exists"
+    echo "$(date) $line $$: $1 bridge network exists"
   fi
 }
 
@@ -69,6 +99,8 @@ EOF
 }
 
 if [[ $# -eq 1 && $1 == $C_START ]] ; then
+  check_network $D_NETAPPS
+  check_network $D_NETKIND
   check_command $1
   echo "$(date) $line $$: $C_COMMAND all kubernetes services"
   # Once you have docker running you can create a cluster with:
