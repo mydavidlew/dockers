@@ -236,5 +236,7 @@ elif [[ $# -eq 1 && $1 == $C_STOP ]] ; then
   kind delete cluster
 else
   echo "$(date) $line $$: You have gone to the wrong party! use '$0 $C_START/$C_STOP $APP_DASHBOARD/$APP_PORTAINER/$APP_INGRESS'"
+  # show the docker containers and systems
+  check_docker
 fi
 # end
