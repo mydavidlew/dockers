@@ -205,12 +205,33 @@ $ cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: ServiceAccount
 metadata:
+  name: <user>
+  namespace: <namespace>
+EOF
+$ cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: ServiceAccount
+metadata:
   name: admin-user
   namespace: kubernetes-dashboard
 EOF
 
 Creating a ClusterRoleBinding
 In most cases after provisioning cluster using "kops", "kubeadm" or any other popular tool, the "ClusterRole" "cluster-admin" already exists in the cluster. We can use it and create only "ClusterRoleBinding" for our "ServiceAccount". If it does not exist then you need to create this role first and grant required privileges manually.
+$ cat <<EOF | kubectl apply -f -
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: <user>
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: <user>
+  namespace: <namespace>
+EOF
 $ cat <<EOF | kubectl apply -f -
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -227,7 +248,12 @@ subjects:
 EOF
 
 Getting a Bearer Token - Now we need to find token we can use to log in. Execute following command:
+$ kubectl -n <namespace> get secret $(kubectl -n <namespace> get sa/<user> -o jsonpath="{.secrets[0].name}") -o go-template="{{.data.token | base64decode}}"
 $ kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user -o jsonpath="{.secrets[0].name}") -o go-template="{{.data.token | base64decode}}"
+
+Creating a Bearer Token - Now we can create a token to be used to log in. Execute following command:
+$ kubectl -n <namespace> create token <user>
+$ kubectl -n kubernetes-dashboard create token admin-user
 
 Accessing the Dashboard UI - To protect your cluster data, Dashboard deploys with a minimal RBAC configuration by default. Currently, Dashboard only supports logging in with a Bearer Token. Now copy the token and paste it into Enter token field on the login screen at below url. Click "Sign in" button and that's it. You are now logged in as an admin.
 Kubectl will make Dashboard available at:
