@@ -20,6 +20,7 @@ function check_network() {
     echo "$(date) $line $$: creating $D_NETAPPS bridge network"
     sudo ip link add $D_IFAPPS type bridge
     sleep $SLEEP_INT
+    docker network rm $D_NETAPPS
     docker network create \
       --driver=bridge \
       --ipv6=false \
@@ -39,6 +40,7 @@ function check_network() {
     echo "$(date) $line $$: creating $D_NETKIND bridge network"
     sudo ip link add $D_IFKIND type bridge
     sleep $SLEEP_INT
+    docker network rm $D_NETKIND
     docker network create \
       --driver=bridge \
       --ipv6=false \
