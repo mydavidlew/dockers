@@ -178,7 +178,8 @@ elif [[ $# -eq 2 && $1 == $C_START && $2 == $APP_DASHBOARD ]] ; then
   #
   # Getting a Bearer Token - Now we need to find token we can use to log in. Execute following command:
   echo "$(date) $line $$: 4 Create the Authorization Token..."
-  kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user -o jsonpath="{.secrets[0].name}") -o go-template="{{.data.token | base64decode}}" > kubernetes/kubeui-token.txt
+  #ubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user -o jsonpath="{.secrets[0].name}") -o go-template="{{.data.token | base64decode}}" > kubernetes/kubeui-token.txt
+  kubectl -n kubernetes-dashboard create token admin-user
   echo "Token in kubernetes/kubeui-token.txt file"
   echo
   #
