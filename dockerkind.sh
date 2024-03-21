@@ -15,7 +15,7 @@ function check_command() {
   fi
 }
 
-function check_network() { 
+function check_network() {
   if [[ ! "$(ip link show | grep $D_IFAPPS)" ]] ; then
     echo "$(date) $line $$: creating $D_IFAPPS bridge interface"
     sudo ip link add $D_IFAPPS type bridge && sleep 3
@@ -43,11 +43,11 @@ function check_network() {
     echo "$(date) $line $$: $D_NETAPPS bridge network exists"
   fi
   # && #
-  if [[ ! "$(ip link show | grep $D_NETKIND)" ]] ; then
-    echo "$(date) $line $$: creating $D_NETKIND bridge interface"
+  if [[ ! "$(ip link show | grep $D_IFKIND)" ]] ; then
+    echo "$(date) $line $$: creating $D_IFKIND bridge interface"
     sudo ip link add $D_IFKIND type bridge; sleep 3
   else
-    echo "$(date) $line $$: $D_NETKIND bridge interface exists"
+    echo "$(date) $line $$: $D_IFKIND bridge interface exists"
   fi
   if [[ ! "$(docker network ls | grep $D_NETKIND)" ]] ; then
     echo "$(date) $line $$: creating $D_NETKIND bridge network"
