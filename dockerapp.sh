@@ -41,10 +41,17 @@ function check_command() {
 }
 
 function check_network() { 
+  if [[ ! "$(ip link show | grep $D_IFAPPS)" ]] ; then
+    echo "$(date) $line $$: creating $D_IFAPPS bridge interface"
+    sudo ip link add $D_IFAPPS type bridge && sleep 3
+  else
+    echo "$(date) $line $$: $D_IFAPPS bridge interface exists"
+  fi
   if [[ ! "$(docker network ls | grep $D_NETAPPS)" ]] ; then
     echo "$(date) $line $$: creating $D_NETAPPS bridge network"
-    sudo ip link add $D_IFAPPS type bridge
-    sleep $SLEEP_INT
+    if [[ "$(docker network ls | grep $D_NETAPPS)" ]] ; then
+      docker network rm $D_NETAPPS && sleep 3
+    fi
     docker network create \
       --driver=bridge \
       --ipv6=false \
