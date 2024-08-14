@@ -13,7 +13,7 @@ L_BC1=business-central-workbench; L_KS1=kie-server
 
 SLEEP_INT=1
 D_IFAPPS=docnet0; D_NETAPPS=appnet
-C_START=start; C_STOP=stop; C_RUN=run; C_REMOVE=rm; C_INIT=init; C_INITX=initx
+C_START=start; C_STOP=stop; C_RUN=run; C_REMOVE=rm; C_INIT=init; C_INITX=initx; C_CLEAR=clear
 C_DOCKER01="docker $C_RUN --rm -d"
 C_DOCKER02="docker $C_RUN -d"
 C_DOCKER=$C_DOCKER02
@@ -27,8 +27,11 @@ LABEL_ES="io.portainer.kubernetes.application.stack=elasticsearch"
 LABEL_DE="io.portainer.kubernetes.application.stack=rulengine"
 LABEL_PA="io.portainer.kubernetes.application.stack=portainer"
 
+DSTART_CMD='docker run --rm -d --hostname="deepface1.local" --name="deepface1" --network="appnet" --label="io.portainer.kubernetes.application.stack=deepface1" -p 5000:5000 deepface:latest'
+DSTOP_CMD='docker stop deepface1'
+
 function check_command() {
-  if [[ $1 == $C_START || $1 == $C_STOP || $1 == $C_RUN || $1 == $C_REMOVE || $1 == $C_INIT || $1 == $C_INITX ]] ; then
+  if [[ $1 == $C_START || $1 == $C_STOP || $1 == $C_RUN || $1 == $C_REMOVE || $1 == $C_INIT || $1 == $C_INITX || $1 == $C_CLEAR ]] ; then
     echo "$(date) $line $$: valid docker $1 command found"
     C_COMMAND=$1
     if [[ $1 == $C_INIT ]] ; then
@@ -70,8 +73,9 @@ function check_network() {
 }
 
 function check_docker() {
-  echo "$(date) $line $$: list of container, storage and network"
+  echo "$(date) $line $$: list of container, image, storage and network"
   docker ps -a
+  docker images -a
   docker system df
   docker network ls
 }
@@ -303,7 +307,16 @@ elif [[ $# -eq 2 && $1 != $C_RUN && $2 == $APP_XX ]] ; then
   get_netstat $C_COMMAND $D_XX1
   sleep $SLEEP_INT
 else
-  echo "$(date) $line $$: Wrong party! pls use '$0 <$C_START/$C_STOP/$C_RUN/$C_REMOVE/$C_INIT(x)> <$APP_DS/$APP_MA/$APP_MS/$APP_ES/$APP_EB/$APP_DE/$APP_PA>'"
+  if [[ $# -eq 1 && $1 == $C_CLEAR ]] ; then
+    echo "$(date) $line $$: remove the $D_NETAPPS network interface"
+    docker network rm $D_NETAPPS && sleep 3
+    check_network
+  else
+    echo "$(date) $line $$: Wrong party! pls use '$0 <$C_START/$C_STOP/$C_RUN/$C_REMOVE/$C_INIT(x)/$C_CLEAR> <$APP_DS/$APP_MA/$APP_MS/$APP_ES/$APP_EB/$APP_DE/$APP_PA>'"
+    echo "$(date) $line $$: cmd> INIT  - fresh start, pull frm docker hub & start the service"
+    echo "$(date) $line $$: cmd> INITX - configure persistance local store with access rights"
+    echo "$(date) $line $$: cmd> CLEAR - remove the '$D_NETAPPS' network and recreate it again"
+  fi
 fi
 # show the docker containers and systems
 check_docker
