@@ -74,6 +74,7 @@ function check_network() {
 function check_docker() {
   echo "$(date) $line $$: list of container, storage and network"
   docker ps -a
+  docker images -a
   docker system df
   docker network ls
 }
