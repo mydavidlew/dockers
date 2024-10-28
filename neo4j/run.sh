@@ -1,5 +1,5 @@
 docker run -it --rm --name=neo4j --network=appnet --user="$(id -u):$(id -g)" -e NEO4J_AUTH=none \
-  -v $PWD/data:/data -v $PWD/conf:/var/lib/neo4j/conf \
+  -v $PWD/data:/data -v $PWD/conf:/var/lib/neo4j/conf -v $PWD/plugins:/var/lib/neo4j/plugins \
   -p 7474:7474 -p 7687:7687 \
   neo4j:latest
 
